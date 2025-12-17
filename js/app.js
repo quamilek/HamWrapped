@@ -57,8 +57,8 @@ class HamWrappedApp {
 
         // Click to upload
         uploadArea.addEventListener('click', (e) => {
-            // Nie otwieraj ponownie jeśli kliknięto na sam input
-            if (e.target !== fileInput) {
+            // Nie otwieraj ponownie jeśli kliknięto na sam input lub label
+            if (e.target !== fileInput && !e.target.closest('.upload-btn')) {
                 fileInput.click();
             }
         });
@@ -69,8 +69,12 @@ class HamWrappedApp {
             }
         });
 
-        // Zatrzymaj propagację kliknięcia na input
+        // Zatrzymaj propagację kliknięcia na input i label
         fileInput.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+
+        document.querySelector('.upload-btn').addEventListener('click', (e) => {
             e.stopPropagation();
         });
 
