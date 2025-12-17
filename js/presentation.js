@@ -506,10 +506,19 @@ class Presentation {
             icon: '🌍',
             value: continents,
             label: t('continentsTitle'),
-            subtitle: `${this.stats.byDXCC?.count || 0} DXCC`
+            subtitle: ''
         });
 
-        // 8. CQ Zones
+        // 8. DXCC
+        const dxccCount = this.stats.byDXCC?.count || 0;
+        items.push({
+            icon: '🏆',
+            value: dxccCount,
+            label: 'DXCC',
+            subtitle: i18n.currentLang === 'pl' ? 'krajów' : 'countries'
+        });
+
+        // 9. CQ Zones
         const cqZones = this.stats.byCQZone ? this.stats.byCQZone.count : 0;
         items.push({
             icon: '🗺️',
