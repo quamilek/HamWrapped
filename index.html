@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ham Wrapped 2025 - Twoje podsumowanie krótkofalarskie</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="app">
+        <!-- Ekran powitalny / Upload -->
+        <section id="upload-section" class="screen active">
+            <div class="container">
+                <div class="logo">
+                    <span class="logo-icon">📻</span>
+                    <h1>Ham Wrapped</h1>
+                    <p class="subtitle">2025</p>
+                </div>
+
+                <div class="upload-area" id="upload-area">
+                    <div class="upload-icon">📁</div>
+                    <h2>Wrzuć swój log ADIF</h2>
+                    <p>Przeciągnij plik .adi lub .adif tutaj</p>
+                    <p class="or">lub</p>
+                    <label class="upload-btn">
+                        Wybierz plik
+                        <input type="file" id="file-input" accept=".adi,.adif,.ADI,.ADIF" hidden>
+                    </label>
+                </div>
+
+                <div class="callsign-input">
+                    <label for="user-callsign">Twój znak wywoławczy (opcjonalnie):</label>
+                    <input type="text" id="user-callsign" placeholder="np. SP5XXX" maxlength="10">
+                    <p class="hint">Potrzebny do obliczenia odległości QSO</p>
+                </div>
+
+                <div class="user-locator-input">
+                    <label for="user-locator">Twój lokator (opcjonalnie):</label>
+                    <input type="text" id="user-locator" placeholder="np. KO02MC" maxlength="6">
+                    <p class="hint">Potrzebny do obliczenia odległości QSO</p>
+                </div>
+
+                <div id="loading" class="loading hidden">
+                    <div class="spinner"></div>
+                    <p>Analizuję Twój log...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Prezentacja Wrapped -->
+        <section id="presentation-section" class="screen">
+            <div class="slides-container" id="slides-container">
+                <!-- Slajdy będą generowane dynamicznie przez JavaScript -->
+            </div>
+
+            <div class="navigation">
+                <button id="prev-btn" class="nav-btn" disabled>
+                    <span>←</span>
+                </button>
+                <div class="progress-dots" id="progress-dots"></div>
+                <button id="next-btn" class="nav-btn">
+                    <span>→</span>
+                </button>
+            </div>
+
+            <button id="restart-btn" class="restart-btn">
+                🔄 Załaduj nowy log
+            </button>
+        </section>
+    </div>
+
+    <script src="js/dxcc-data.js"></script>
+    <script src="js/callsign-lookup.js"></script>
+    <script src="js/adif-parser.js"></script>
+    <script src="js/statistics.js"></script>
+    <script src="js/presentation.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
