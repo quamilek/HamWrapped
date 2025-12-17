@@ -87,7 +87,6 @@ class StatisticsCalculator {
             distribution: months,
             best: {
                 month: bestMonth,
-                monthName: MONTH_NAMES[bestMonth - 1],
                 count: maxQSOs
             }
         };
@@ -154,7 +153,7 @@ class StatisticsCalculator {
             distribution: days,
             best: {
                 day: bestDay,
-                dayName: DAY_NAMES[bestDay],
+                dayIndex: bestDay,
                 count: maxQSOs
             }
         };
@@ -271,8 +270,7 @@ class StatisticsCalculator {
         const sorted = Object.entries(continents)
             .sort((a, b) => b[1] - a[1])
             .map(([cont, count]) => ({
-                code: cont,
-                name: CONTINENT_NAMES[cont] || cont,
+                continent: cont,
                 count,
                 percentage: ((count / this.qsos.length) * 100).toFixed(1)
             }));

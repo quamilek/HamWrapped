@@ -90,16 +90,16 @@ class Presentation {
      */
     addIntroSlide() {
         const title = this.userCallsign
-            ? `${this.userCallsign} - rok ${this.year}`
-            : `Twój rok ${this.year}`;
+            ? t('introTitleWithCall', { callsign: this.userCallsign, year: this.year })
+            : t('introTitle', { year: this.year });
 
         this.slides.push({
             theme: 'theme-1',
             icon: '📻',
             title: title,
-            value: 'HAM WRAPPED',
-            description: 'Odkryj swoje krótkofalarskie podsumowanie roku!',
-            subtitle: 'Przesuń, aby zobaczyć statystyki →'
+            value: t('introValue'),
+            description: t('introDescription'),
+            subtitle: t('introSubtitle')
         });
     }
 
@@ -110,9 +110,9 @@ class Presentation {
         this.slides.push({
             theme: 'theme-2',
             icon: '🎯',
-            title: 'Łączności w tym roku',
+            title: t('totalQSOsTitle'),
             value: this.formatNumber(this.stats.totalQSOs),
-            description: `Nawiązałeś ${this.stats.totalQSOs} QSO!`,
+            description: t('totalQSOsDescription', { count: this.formatNumber(this.stats.totalQSOs) }),
             subtitle: this.getQSOComment(this.stats.totalQSOs)
         });
     }
@@ -121,13 +121,14 @@ class Presentation {
      * Slajd z unikalnymi callsigns
      */
     addUniqueCallsignsSlide() {
+        const avg = (this.stats.totalQSOs / this.stats.uniqueCallsigns.count).toFixed(1);
         this.slides.push({
             theme: 'theme-3',
             icon: '👥',
-            title: 'Unikalne stacje',
+            title: t('uniqueCallsignsTitle'),
             value: this.formatNumber(this.stats.uniqueCallsigns.count),
-            description: 'Rozmawiałeś z tyloma różnymi stacjami!',
-            subtitle: `To średnio ${(this.stats.totalQSOs / this.stats.uniqueCallsigns.count).toFixed(1)} QSO na stację`
+            description: t('uniqueCallsignsDescription'),
+            subtitle: t('uniqueCallsignsSubtitle', { avg: avg })
         });
     }
 
@@ -136,13 +137,14 @@ class Presentation {
      */
     addBestMonthSlide() {
         const best = this.stats.byMonth.best;
+        const monthName = i18n.getMonthName(parseInt(best.month) - 1);
         this.slides.push({
             theme: 'theme-4',
             icon: '📅',
-            title: 'Twój najlepszy miesiąc',
-            value: best.monthName,
-            description: `${this.formatNumber(best.count)} QSO w tym miesiącu!`,
-            subtitle: 'To był Twój najbardziej aktywny miesiąc'
+            title: t('bestMonthTitle'),
+            value: monthName,
+            description: t('bestMonthDescription', { count: this.formatNumber(best.count) }),
+            subtitle: t('bestMonthSubtitle')
         });
     }
 
@@ -152,7 +154,7 @@ class Presentation {
     addBestDaySlide() {
         const best = this.stats.byDay.best;
         const date = new Date(best.date);
-        const formattedDate = date.toLocaleDateString('pl-PL', {
+        const formattedDate = date.toLocaleDateString(i18n.getLocale(), {
             day: 'numeric',
             month: 'long',
             year: 'numeric'
@@ -161,11 +163,11 @@ class Presentation {
         this.slides.push({
             theme: 'theme-5',
             icon: '🔥',
-            title: 'Rekordowy dzień',
+            title: t('bestDayTitle'),
             value: this.formatNumber(best.count),
             valueUnit: 'QSO',
             description: formattedDate,
-            subtitle: 'Twój najbardziej aktywny dzień w roku!'
+            subtitle: t('bestDaySubtitle')
         });
     }
 
@@ -177,10 +179,10 @@ class Presentation {
         this.slides.push({
             theme: 'theme-6',
             icon: '📡',
-            title: 'Twój ulubiony mod',
+            title: t('favoriteModeTitle'),
             value: fav.mode,
-            description: `${fav.percentage}% wszystkich łączności`,
-            subtitle: `${this.formatNumber(fav.count)} QSO w tym modzie`
+            description: t('favoriteModeDescription', { percentage: fav.percentage }),
+            subtitle: t('favoriteModeSubtitle', { count: this.formatNumber(fav.count) })
         });
     }
 
@@ -193,7 +195,7 @@ class Presentation {
         this.slides.push({
             theme: 'theme-7',
             icon: '📊',
-            title: 'Rozkład modów',
+            title: t('allModesTitle'),
             type: 'progress',
             items: modes.map(m => ({
                 label: m.mode,
@@ -211,10 +213,10 @@ class Presentation {
         this.slides.push({
             theme: 'theme-8',
             icon: '🌊',
-            title: 'Ulubione pasmo',
+            title: t('favoriteBandTitle'),
             value: fav.band,
-            description: `${fav.percentage}% łączności`,
-            subtitle: `Pracowałeś na ${this.stats.byBand.count} różnych pasmach`
+            description: t('favoriteBandDescription', { percentage: fav.percentage }),
+            subtitle: t('favoriteBandSubtitle', { count: this.stats.byBand.count })
         });
     }
 
@@ -228,10 +230,10 @@ class Presentation {
             this.slides.push({
                 theme: 'theme-1',
                 icon: '🌍',
-                title: 'Kontynenty',
+                title: t('continentsTitle'),
                 value: '?',
-                description: 'Brak danych o kontynentach',
-                subtitle: 'Sprawdź czy plik ADIF zawiera dane o kontynentach'
+                description: t('continentsNoData'),
+                subtitle: t('continentsNoDataHint')
             });
             return;
         }
@@ -239,11 +241,11 @@ class Presentation {
         this.slides.push({
             theme: 'theme-1',
             icon: '🌍',
-            title: 'Kontynenty',
+            title: t('continentsTitle'),
             type: 'progress',
-            subtitle: `Dotarłeś do ${this.stats.byContinent.count} kontynentów!`,
+            subtitle: t('continentsSubtitle', { count: this.stats.byContinent.count }),
             items: continents.map(c => ({
-                label: c.name,
+                label: i18n.getContinentName(c.continent),
                 value: `${c.percentage}%`,
                 percentage: parseFloat(c.percentage)
             }))
@@ -261,10 +263,10 @@ class Presentation {
             this.slides.push({
                 theme: 'theme-2',
                 icon: '🏆',
-                title: 'Kraje DXCC',
+                title: t('topDXCCTitle'),
                 value: '?',
-                description: 'Brak danych o krajach DXCC',
-                subtitle: 'Sprawdź czy plik ADIF zawiera poprawne callsigns'
+                description: t('dxccNoData'),
+                subtitle: t('dxccNoDataHint')
             });
             return;
         }
@@ -272,9 +274,9 @@ class Presentation {
         this.slides.push({
             theme: 'theme-2',
             icon: '🏆',
-            title: 'Top 5 DXCC',
+            title: t('topDXCCTitle'),
             type: 'list',
-            subtitle: `Pracowałeś z ${count} krajami DXCC!`,
+            subtitle: t('dxccSubtitle', { count: count }),
             items: top.map((c, i) => ({
                 rank: i + 1,
                 label: c.name,
@@ -289,17 +291,17 @@ class Presentation {
     addODXSlide() {
         const odx = this.stats.odx;
         let extraInfo = [];
-        if (odx.band) extraInfo.push(`Pasmo: ${odx.band}`);
-        if (odx.mode) extraInfo.push(`Emisja: ${odx.mode}`);
+        if (odx.band) extraInfo.push(t('odxBand', { band: odx.band }));
+        if (odx.mode) extraInfo.push(t('odxMode', { mode: odx.mode }));
 
         this.slides.push({
             theme: 'theme-3',
             icon: '🚀',
-            title: 'Twój ODX',
+            title: t('odxTitle'),
             value: odx.distance ? `${this.formatNumber(odx.distance)} km` : odx.dxccName,
             valueClass: 'smaller',
             description: odx.distance ? odx.dxccName : '',
-            subtitle: `Stacja: ${odx.call}`,
+            subtitle: t('odxStation', { call: odx.call }),
             extra: extraInfo.join(' • ')
         });
     }
@@ -312,20 +314,20 @@ class Presentation {
         if (!closest || !closest.distance) return;
 
         // Pobierz nazwę kraju - priorytet: dxccName z lookup, potem country z QSO
-        let countryName = closest.dxccName || closest.country || 'Nieznany kraj';
+        let countryName = closest.dxccName || closest.country || t('unknownCountry');
 
         let extraInfo = [];
-        if (closest.band) extraInfo.push(`Pasmo: ${closest.band}`);
-        if (closest.mode) extraInfo.push(`Emisja: ${closest.mode}`);
+        if (closest.band) extraInfo.push(t('odxBand', { band: closest.band }));
+        if (closest.mode) extraInfo.push(t('odxMode', { mode: closest.mode }));
 
         this.slides.push({
             theme: 'theme-4',
             icon: '📍',
-            title: 'Najbliższe QSO',
+            title: t('closestQSOTitle'),
             value: `${this.formatNumber(closest.distance)} km`,
             valueClass: 'smaller',
             description: countryName,
-            subtitle: `Stacja: ${closest.call}`,
+            subtitle: t('odxStation', { call: closest.call }),
             extra: extraInfo.join(' • ')
         });
     }
@@ -339,12 +341,12 @@ class Presentation {
 
         if (rate.peakDate && !isNaN(rate.peakDate.getTime())) {
             try {
-                dateStr = rate.peakDate.toLocaleDateString('pl-PL', {
+                dateStr = rate.peakDate.toLocaleDateString(i18n.getLocale(), {
                     day: 'numeric',
                     month: 'long',
                     year: 'numeric'
                 });
-                const timeStr = rate.peakDate.toLocaleTimeString('pl-PL', {
+                const timeStr = rate.peakDate.toLocaleTimeString(i18n.getLocale(), {
                     hour: '2-digit',
                     minute: '2-digit'
                 });
@@ -353,18 +355,17 @@ class Presentation {
                 dateStr = '';
             }
         } else if (rate.peakHour) {
-            // Fallback - użyj peakHour jako string
             dateStr = rate.peakHour;
         }
 
         this.slides.push({
             theme: 'theme-5',
             icon: '⚡',
-            title: 'Najwyższy QSO Rate',
+            title: t('qsoRateTitle'),
             value: rate.maxRate,
-            valueUnit: 'QSO/h',
-            description: 'Twój rekord prędkości!',
-            subtitle: dateStr ? `Osiągnięty: ${dateStr}` : ''
+            valueUnit: t('qsoRateUnit'),
+            description: t('qsoRateDescription'),
+            subtitle: dateStr ? t('qsoRateSubtitle', { date: dateStr }) : ''
         });
     }
 
@@ -375,12 +376,12 @@ class Presentation {
         this.slides.push({
             theme: 'theme-6',
             icon: '📈',
-            title: 'Twoja aktywność',
+            title: t('activityTitle'),
             type: 'stats',
             items: [
-                { label: 'Aktywne dni', value: this.stats.activeDays },
-                { label: 'Średnio QSO/dzień', value: this.stats.averageQSOsPerDay.average },
-                { label: 'Ulubiony dzień', value: this.stats.byDayOfWeek.best.dayName }
+                { label: t('activeDays'), value: this.stats.activeDays },
+                { label: t('avgQSOPerDay'), value: this.stats.averageQSOsPerDay.average },
+                { label: t('favoriteDay'), value: i18n.getDayName(this.stats.byDayOfWeek.best.dayIndex) }
             ]
         });
     }
@@ -393,11 +394,11 @@ class Presentation {
         this.slides.push({
             theme: 'theme-7',
             icon: '⏰',
-            title: 'Szczyt aktywności',
+            title: t('peakHourTitle'),
             value: `${String(peak.hour).padStart(2, '0')}:00`,
             valueUnit: 'UTC',
-            description: 'O tej godzinie najczęściej nadajesz',
-            subtitle: `${this.formatNumber(peak.count)} QSO w tej godzinie`
+            description: t('peakHourDescription'),
+            subtitle: t('peakHourSubtitle', { count: this.formatNumber(peak.count) })
         });
     }
 
@@ -409,12 +410,12 @@ class Presentation {
         this.slides.push({
             theme: 'theme-8',
             icon: '🔥',
-            title: 'Najdłuższa seria',
+            title: t('streaksTitle'),
             value: streaks.maxStreak,
-            valueUnit: 'dni z rzędu',
-            description: 'Tyle dni z rzędu nawiązywałeś łączności!',
+            valueUnit: t('streaksUnit'),
+            description: t('streaksDescription'),
             subtitle: streaks.maxStreakStart && streaks.maxStreakEnd ?
-                `Od ${streaks.maxStreakStart} do ${streaks.maxStreakEnd}` : ''
+                t('streaksSubtitle', { start: streaks.maxStreakStart, end: streaks.maxStreakEnd }) : ''
         });
     }
 
@@ -425,10 +426,10 @@ class Presentation {
         this.slides.push({
             theme: 'theme-1',
             icon: '🗺️',
-            title: 'Strefy CQ',
+            title: t('cqZonesTitle'),
             value: this.stats.byCQZone.count,
-            description: 'Tyle stref CQ udało Ci się przepracować!',
-            subtitle: 'Na świecie jest 40 stref CQ'
+            description: t('cqZonesDescription'),
+            subtitle: t('cqZonesSubtitle')
         });
     }
 
@@ -437,8 +438,8 @@ class Presentation {
      */
     addSummarySlide() {
         const title = this.userCallsign
-            ? `${this.userCallsign} ${this.year} wrapped`
-            : `${this.year} wrapped`;
+            ? t('summaryTitleWithCall', { callsign: this.userCallsign, year: this.year })
+            : t('summaryTitle', { year: this.year });
 
         // Przygotuj dodatkowe statystyki
         const odxDistance = this.stats.odx && this.stats.odx.distance
@@ -448,7 +449,6 @@ class Presentation {
         const activeDays = this.stats.activeDays || 0;
         const continents = this.stats.byContinent ? this.stats.byContinent.count : 0;
         const cqZones = this.stats.byCQZone ? this.stats.byCQZone.count : 0;
-        const uniqueCallsigns = this.stats.uniqueCallsigns ? this.stats.uniqueCallsigns.count : 0;
 
         this.slides.push({
             theme: 'theme-2',
@@ -457,14 +457,14 @@ class Presentation {
             titleClass: 'title-large',
             type: 'summary',
             items: [
-                { icon: '📻', value: this.formatNumber(this.stats.totalQSOs), label: 'QSO' },
-                { icon: '🌍', value: this.stats.byDXCC.count, label: 'DXCC' },
-                { icon: '🌐', value: continents, label: 'Kontynentów' },
-                { icon: '📡', value: this.stats.byMode.sorted.length, label: 'Modów' },
-                { icon: '🌊', value: this.stats.byBand.count, label: 'Pasm' },
-                { icon: '🗺️', value: cqZones, label: 'Stref CQ' },
-                { icon: '🚀', value: odxDistance, label: 'ODX' },
-                { icon: '📅', value: activeDays, label: 'Aktywnych dni' }
+                { icon: '📻', value: this.formatNumber(this.stats.totalQSOs), label: t('summaryQSO') },
+                { icon: '🌍', value: this.stats.byDXCC.count, label: t('summaryDXCC') },
+                { icon: '🌐', value: continents, label: t('summaryContinents') },
+                { icon: '📡', value: this.stats.byMode.sorted.length, label: t('summaryModes') },
+                { icon: '🌊', value: this.stats.byBand.count, label: t('summaryBands') },
+                { icon: '🗺️', value: cqZones, label: t('summaryCQZones') },
+                { icon: '🚀', value: odxDistance, label: t('summaryODX') },
+                { icon: '📅', value: activeDays, label: t('summaryActiveDays') }
             ]
         });
     }
@@ -720,12 +720,12 @@ class Presentation {
      * Zwróć komentarz do liczby QSO
      */
     getQSOComment(count) {
-        if (count < 100) return 'Dobry początek!';
-        if (count < 500) return 'Świetna robota!';
-        if (count < 1000) return 'Bardzo aktywny rok!';
-        if (count < 5000) return 'Jesteś prawdziwym DX-erem!';
-        if (count < 10000) return 'Niesamowite osiągnięcie!';
-        return 'Legenda pasm!';
+        if (count < 100) return t('qsoComment1');
+        if (count < 500) return t('qsoComment2');
+        if (count < 1000) return t('qsoComment3');
+        if (count < 5000) return t('qsoComment4');
+        if (count < 10000) return t('qsoComment5');
+        return t('qsoComment6');
     }
 }
 

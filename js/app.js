@@ -17,6 +17,11 @@ class HamWrappedApp {
     }
 
     init() {
+        // Inicjalizuj i18n - aktualizuj teksty na stronie
+        if (window.i18n) {
+            i18n.updatePageTexts();
+        }
+
         this.setupFileUpload();
         this.setupNavigation();
         this.setupKeyboardNavigation();

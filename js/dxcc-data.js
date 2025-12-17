@@ -349,19 +349,6 @@ const CONTINENT_NAMES = {
     "AN": "Antarktyda"
 };
 
-// Nazwy miesięcy po polsku
-const MONTH_NAMES = [
-    "Styczeń", "Luty", "Marzec", "Kwiecień", "Maj", "Czerwiec",
-    "Lipiec", "Sierpień", "Wrzesień", "Październik", "Listopad", "Grudzień"
-];
-
-// Nazwy dni tygodnia po polsku
-const DAY_NAMES = [
-    "Niedziela", "Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek", "Sobota"
-];
-
 // Eksport globalny
 window.DXCC_DATA = DXCC_DATA;
 window.CONTINENT_NAMES = CONTINENT_NAMES;
-window.MONTH_NAMES = MONTH_NAMES;
-window.DAY_NAMES = DAY_NAMES;
