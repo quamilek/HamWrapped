@@ -437,8 +437,8 @@ class Presentation {
      */
     addSummarySlide() {
         const title = this.userCallsign
-            ? `${this.userCallsign} - ${this.year}`
-            : `Podsumowanie ${this.year}`;
+            ? `${this.userCallsign} ${this.year} wrapped`
+            : `${this.year} wrapped`;
 
         // Przygotuj dodatkowe statystyki
         const odxDistance = this.stats.odx && this.stats.odx.distance
@@ -465,8 +465,7 @@ class Presentation {
                 { icon: '🗺️', value: cqZones, label: 'Stref CQ' },
                 { icon: '🚀', value: odxDistance, label: 'ODX' },
                 { icon: '📅', value: activeDays, label: 'Aktywnych dni' }
-            ],
-            subtitle: 'Dziękujemy za wspólny rok na pasmach! 73!'
+            ]
         });
     }
 
@@ -603,14 +602,14 @@ class Presentation {
      * Renderuj slajd podsumowania
      */
     renderSummarySlide(slide) {
-        let content = '<div class="summary-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 15px;">';
+        let content = '<div class="summary-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px 20px; margin-top: 10px; padding: 0 10px;">';
 
         slide.items.forEach(item => {
             content += `
-                <div style="text-align: center; padding: 8px;">
-                    <div style="font-size: 1.4rem;">${item.icon}</div>
-                    <div style="font-size: 1.5rem; font-weight: 900; color: var(--neon-green); text-shadow: 0 0 8px var(--neon-green);">${item.value}</div>
-                    <div style="font-size: 0.75rem; opacity: 0.8;">${item.label}</div>
+                <div style="text-align: center; padding: 6px 0; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                    <div style="font-size: 0.9rem; margin-bottom: 2px;">${item.icon}</div>
+                    <div style="font-size: 1.8rem; font-weight: 900; color: var(--neon-green); text-shadow: 0 0 10px var(--neon-green); line-height: 1.1;">${item.value}</div>
+                    <div style="font-size: 0.7rem; opacity: 0.8; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px;">${item.label}</div>
                 </div>
             `;
         });
