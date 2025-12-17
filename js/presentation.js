@@ -272,7 +272,7 @@ class Presentation {
         this.slides.push({
             theme: 'theme-2',
             icon: '🏆',
-            title: 'Top 5 krajów DXCC',
+            title: 'Top 5 DXCC',
             type: 'list',
             subtitle: `Pracowałeś z ${count} krajami DXCC!`,
             items: top.map((c, i) => ({
@@ -314,6 +314,10 @@ class Presentation {
         // Pobierz nazwę kraju - priorytet: dxccName z lookup, potem country z QSO
         let countryName = closest.dxccName || closest.country || 'Nieznany kraj';
 
+        let extraInfo = [];
+        if (closest.band) extraInfo.push(`Pasmo: ${closest.band}`);
+        if (closest.mode) extraInfo.push(`Emisja: ${closest.mode}`);
+
         this.slides.push({
             theme: 'theme-4',
             icon: '📍',
@@ -321,7 +325,8 @@ class Presentation {
             value: `${this.formatNumber(closest.distance)} km`,
             valueClass: 'smaller',
             description: countryName,
-            subtitle: `Stacja: ${closest.call}`
+            subtitle: `Stacja: ${closest.call}`,
+            extra: extraInfo.join(' • ')
         });
     }
 
@@ -435,6 +440,16 @@ class Presentation {
             ? `${this.userCallsign} - ${this.year}`
             : `Podsumowanie ${this.year}`;
 
+        // Przygotuj dodatkowe statystyki
+        const odxDistance = this.stats.odx && this.stats.odx.distance
+            ? `${this.formatNumber(this.stats.odx.distance)} km`
+            : '-';
+
+        const activeDays = this.stats.activeDays || 0;
+        const continents = this.stats.byContinent ? this.stats.byContinent.count : 0;
+        const cqZones = this.stats.byCQZone ? this.stats.byCQZone.count : 0;
+        const uniqueCallsigns = this.stats.uniqueCallsigns ? this.stats.uniqueCallsigns.count : 0;
+
         this.slides.push({
             theme: 'theme-2',
             icon: '🎉',
@@ -444,8 +459,12 @@ class Presentation {
             items: [
                 { icon: '📻', value: this.formatNumber(this.stats.totalQSOs), label: 'QSO' },
                 { icon: '🌍', value: this.stats.byDXCC.count, label: 'DXCC' },
+                { icon: '🌐', value: continents, label: 'Kontynentów' },
                 { icon: '📡', value: this.stats.byMode.sorted.length, label: 'Modów' },
-                { icon: '🌊', value: this.stats.byBand.count, label: 'Pasm' }
+                { icon: '🌊', value: this.stats.byBand.count, label: 'Pasm' },
+                { icon: '🗺️', value: cqZones, label: 'Stref CQ' },
+                { icon: '🚀', value: odxDistance, label: 'ODX' },
+                { icon: '📅', value: activeDays, label: 'Aktywnych dni' }
             ],
             subtitle: 'Dziękujemy za wspólny rok na pasmach! 73!'
         });
@@ -584,14 +603,14 @@ class Presentation {
      * Renderuj slajd podsumowania
      */
     renderSummarySlide(slide) {
-        let content = '<div class="summary-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 20px;">';
+        let content = '<div class="summary-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 15px;">';
 
         slide.items.forEach(item => {
             content += `
-                <div style="text-align: center;">
-                    <div style="font-size: 2rem;">${item.icon}</div>
-                    <div style="font-size: 2rem; font-weight: 900;">${item.value}</div>
-                    <div style="font-size: 0.9rem; opacity: 0.8;">${item.label}</div>
+                <div style="text-align: center; padding: 8px;">
+                    <div style="font-size: 1.4rem;">${item.icon}</div>
+                    <div style="font-size: 1.5rem; font-weight: 900; color: var(--neon-green); text-shadow: 0 0 8px var(--neon-green);">${item.value}</div>
+                    <div style="font-size: 0.75rem; opacity: 0.8;">${item.label}</div>
                 </div>
             `;
         });
