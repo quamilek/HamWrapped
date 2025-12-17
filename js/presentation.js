@@ -602,14 +602,16 @@ class Presentation {
      * Renderuj slajd podsumowania
      */
     renderSummarySlide(slide) {
-        let content = '<div class="summary-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px 20px; margin-top: 10px; padding: 0 10px;">';
+        let content = '<div class="summary-grid" style="display: flex; flex-direction: column; gap: 4px; margin-top: 5px; padding: 0 10px;">';
 
         slide.items.forEach(item => {
             content += `
-                <div style="text-align: center; padding: 6px 0; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                    <div style="font-size: 0.9rem; margin-bottom: 2px;">${item.icon}</div>
-                    <div style="font-size: 1.8rem; font-weight: 900; color: var(--neon-green); text-shadow: 0 0 10px var(--neon-green); line-height: 1.1;">${item.value}</div>
-                    <div style="font-size: 0.7rem; opacity: 0.8; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px;">${item.label}</div>
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 5px 10px; background: rgba(0, 0, 0, 0.2); border-left: 3px solid var(--neon-green);">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <div style="font-size: 0.85rem;">${item.icon}</div>
+                        <div style="font-size: 1.3rem; font-weight: 900; color: var(--neon-green); text-shadow: 0 0 10px var(--neon-green);">${item.value}</div>
+                    </div>
+                    <div style="font-size: 0.65rem; opacity: 0.8; text-transform: uppercase; letter-spacing: 1px; text-align: right;">${item.label}</div>
                 </div>
             `;
         });
