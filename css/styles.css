@@ -299,8 +299,8 @@ body::before {
 .slides-container {
     width: 100%;
     max-width: 450px;
-    height: calc(100vh - 150px);
-    max-height: 600px;
+    height: calc(100vh - 120px);
+    max-height: 850px;
     position: relative;
 }
 
@@ -629,6 +629,12 @@ body::before {
         border-radius: 0;
     }
 
+    /* Na mobile slajd podsumowania wraca do normalnej szerokości */
+    .slide-scrollable {
+        width: 100%;
+        left: 0;
+    }
+
     .slide-icon {
         font-size: 60px;
         margin-bottom: 15px;
@@ -767,5 +773,235 @@ body::before {
     100% {
         transform: translateY(100vh) rotate(720deg);
         opacity: 0;
+    }
+}
+
+/* ==========================================
+   COMPREHENSIVE SUMMARY SLIDE STYLES
+   ========================================== */
+
+.slide-scrollable {
+    overflow: hidden;
+    justify-content: flex-start;
+    padding-top: 20px;
+    padding-bottom: 15px;
+    width: 160%;
+    left: -30%;
+}
+
+.slide-scrollable .slide-icon {
+    flex-shrink: 0;
+    font-size: 45px;
+    margin-bottom: 8px;
+}
+
+.slide-scrollable .slide-title {
+    flex-shrink: 0;
+    margin-bottom: 12px;
+    font-size: 1rem;
+}
+
+.summary-scroll-container {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    width: 100%;
+    padding: 5px 0;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: var(--neon-cyan) transparent;
+}
+
+.summary-scroll-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.summary-scroll-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.summary-scroll-container::-webkit-scrollbar-thumb {
+    background: var(--neon-cyan);
+    border-radius: 3px;
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    padding: 0 10px;
+    width: 100%;
+}
+
+.summary-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 10px;
+    background: rgba(0, 0, 0, 0.3);
+    border-left: 3px solid var(--neon-green);
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%);
+    transition: all 0.2s ease;
+}
+
+.summary-item:hover {
+    background: rgba(0, 255, 0, 0.1);
+    border-left-color: var(--neon-cyan);
+}
+
+.summary-item-icon {
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.summary-item-content {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.summary-item-value {
+    font-size: 1rem;
+    font-weight: 900;
+    color: var(--neon-green);
+    text-shadow: 0 0 10px var(--neon-green);
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.summary-item-label {
+    font-size: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    opacity: 0.9;
+    color: var(--neon-cyan);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.summary-item-subtitle {
+    font-size: 0.45rem;
+    opacity: 0.7;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 1px;
+}
+
+/* Desktop - larger summary */
+@media (min-width: 768px) {
+    .summary-grid {
+        gap: 12px;
+        padding: 0 15px;
+    }
+
+    .summary-item {
+        padding: 12px 15px;
+    }
+
+    .summary-item-icon {
+        font-size: 1.5rem;
+    }
+
+    .summary-item-value {
+        font-size: 1.4rem;
+    }
+
+    .summary-item-label {
+        font-size: 0.65rem;
+        letter-spacing: 1px;
+    }
+
+    .summary-item-subtitle {
+        font-size: 0.6rem;
+    }
+}
+
+/* Large desktop */
+@media (min-width: 1024px) {
+    .summary-grid {
+        max-width: 700px;
+        margin: 0 auto;
+        gap: 15px;
+    }
+
+    .summary-item {
+        padding: 15px 20px;
+    }
+
+    .summary-item-value {
+        font-size: 1.6rem;
+    }
+
+    .summary-item-label {
+        font-size: 0.7rem;
+    }
+
+    .summary-item-subtitle {
+        font-size: 0.65rem;
+    }
+}
+
+/* Mobile - 2 columns on medium screens, 1 on very small */
+@media (max-width: 600px) {
+    .summary-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 6px;
+    }
+}
+
+@media (max-width: 400px) {
+    .summary-grid {
+        grid-template-columns: 1fr;
+        gap: 5px;
+    }
+
+    .summary-item {
+        padding: 8px 10px;
+    }
+
+    .summary-item-icon {
+        font-size: 1rem;
+    }
+
+    .summary-item-value {
+        font-size: 1rem;
+    }
+}
+
+/* Short screens - ensure scrolling works */
+@media (max-height: 700px) {
+    .slide-scrollable .slide-icon {
+        font-size: 35px;
+        margin-bottom: 5px;
+    }
+
+    .slide-scrollable .slide-title {
+        font-size: 0.85rem;
+        margin-bottom: 8px;
+    }
+
+    .summary-grid {
+        gap: 5px;
+    }
+
+    .summary-item {
+        padding: 6px 8px;
+    }
+
+    .summary-item-value {
+        font-size: 0.95rem;
+    }
+
+    .summary-item-label {
+        font-size: 0.5rem;
+    }
+
+    .summary-item-subtitle {
+        font-size: 0.45rem;
     }
 }

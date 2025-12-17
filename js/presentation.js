@@ -434,21 +434,146 @@ class Presentation {
     }
 
     /**
-     * Slajd podsumowujący
+     * Slajd podsumowujący - zbiera dane ze wszystkich slajdów
      */
     addSummarySlide() {
         const title = this.userCallsign
             ? t('summaryTitleWithCall', { callsign: this.userCallsign, year: this.year })
             : t('summaryTitle', { year: this.year });
 
-        // Przygotuj dodatkowe statystyki
-        const odxDistance = this.stats.odx && this.stats.odx.distance
-            ? `${this.formatNumber(this.stats.odx.distance)} km`
-            : '-';
+        // Zbierz wszystkie statystyki
+        const items = [];
 
-        const activeDays = this.stats.activeDays || 0;
+        // 1. Total QSOs
+        items.push({
+            icon: '📻',
+            value: this.formatNumber(this.stats.totalQSOs),
+            label: t('summaryQSO'),
+            subtitle: this.getQSOComment(this.stats.totalQSOs)
+        });
+
+        // 2. Unique callsigns
+        const avgPerStation = (this.stats.totalQSOs / this.stats.uniqueCallsigns.count).toFixed(1);
+        items.push({
+            icon: '👥',
+            value: this.formatNumber(this.stats.uniqueCallsigns.count),
+            label: t('uniqueCallsignsTitle'),
+            subtitle: `${avgPerStation} QSO/${i18n.currentLang === 'pl' ? 'stację' : 'station'}`
+        });
+
+        // 3. Best month
+        const bestMonth = this.stats.byMonth.best;
+        const monthName = i18n.getMonthName(parseInt(bestMonth.month) - 1);
+        items.push({
+            icon: '📅',
+            value: monthName,
+            label: t('bestMonthTitle'),
+            subtitle: `${this.formatNumber(bestMonth.count)} QSO`
+        });
+
+        // 4. Best day
+        const bestDay = this.stats.byDay.best;
+        const bestDayDate = new Date(bestDay.date);
+        const formattedBestDay = bestDayDate.toLocaleDateString(i18n.getLocale(), { day: 'numeric', month: 'short' });
+        items.push({
+            icon: '🔥',
+            value: this.formatNumber(bestDay.count),
+            label: t('bestDayTitle'),
+            subtitle: formattedBestDay
+        });
+
+        // 5. Favorite mode
+        const favMode = this.stats.byMode.favorite;
+        items.push({
+            icon: '📡',
+            value: favMode.mode,
+            label: t('favoriteModeTitle'),
+            subtitle: `${favMode.percentage}%`
+        });
+
+        // 6. Favorite band
+        const favBand = this.stats.byBand.favorite;
+        items.push({
+            icon: '🌊',
+            value: favBand.band,
+            label: t('favoriteBandTitle'),
+            subtitle: `${this.stats.byBand.count} ${i18n.currentLang === 'pl' ? 'pasm' : 'bands'}`
+        });
+
+        // 7. Continents
         const continents = this.stats.byContinent ? this.stats.byContinent.count : 0;
+        items.push({
+            icon: '🌍',
+            value: continents,
+            label: t('continentsTitle'),
+            subtitle: `${this.stats.byDXCC?.count || 0} DXCC`
+        });
+
+        // 8. CQ Zones
         const cqZones = this.stats.byCQZone ? this.stats.byCQZone.count : 0;
+        items.push({
+            icon: '🗺️',
+            value: `${cqZones}/40`,
+            label: t('cqZonesTitle'),
+            subtitle: ''
+        });
+
+        // 9. ODX
+        if (this.stats.odx && this.stats.odx.distance) {
+            items.push({
+                icon: '🚀',
+                value: `${this.formatNumber(this.stats.odx.distance)} km`,
+                label: t('odxTitle'),
+                subtitle: this.stats.odx.dxccName || this.stats.odx.call
+            });
+        }
+
+        // 10. Closest QSO
+        if (this.stats.closestQSO && this.stats.closestQSO.distance) {
+            items.push({
+                icon: '📍',
+                value: `${this.formatNumber(this.stats.closestQSO.distance)} km`,
+                label: t('closestQSOTitle'),
+                subtitle: this.stats.closestQSO.call
+            });
+        }
+
+        // 11. QSO Rate
+        if (this.stats.qsoRate && this.stats.qsoRate.maxRate > 0) {
+            items.push({
+                icon: '⚡',
+                value: this.stats.qsoRate.maxRate,
+                label: t('qsoRateTitle'),
+                subtitle: t('qsoRateUnit')
+            });
+        }
+
+        // 12. Active days
+        items.push({
+            icon: '📈',
+            value: this.stats.activeDays || 0,
+            label: t('activeDays'),
+            subtitle: `${this.stats.averageQSOsPerDay?.average || 0} QSO/${i18n.currentLang === 'pl' ? 'dzień' : 'day'}`
+        });
+
+        // 13. Peak hour
+        const peakHour = this.stats.byHour.peak;
+        items.push({
+            icon: '⏰',
+            value: `${String(peakHour.hour).padStart(2, '0')}:00`,
+            label: t('peakHourTitle'),
+            subtitle: 'UTC'
+        });
+
+        // 14. Streak
+        if (this.stats.streaks && this.stats.streaks.maxStreak > 1) {
+            items.push({
+                icon: '🔥',
+                value: this.stats.streaks.maxStreak,
+                label: t('streaksTitle'),
+                subtitle: t('streaksUnit')
+            });
+        }
 
         this.slides.push({
             theme: 'theme-2',
@@ -456,16 +581,8 @@ class Presentation {
             title: title,
             titleClass: 'title-large',
             type: 'summary',
-            items: [
-                { icon: '📻', value: this.formatNumber(this.stats.totalQSOs), label: t('summaryQSO') },
-                { icon: '🌍', value: this.stats.byDXCC.count, label: t('summaryDXCC') },
-                { icon: '🌐', value: continents, label: t('summaryContinents') },
-                { icon: '📡', value: this.stats.byMode.sorted.length, label: t('summaryModes') },
-                { icon: '🌊', value: this.stats.byBand.count, label: t('summaryBands') },
-                { icon: '🗺️', value: cqZones, label: t('summaryCQZones') },
-                { icon: '🚀', value: odxDistance, label: t('summaryODX') },
-                { icon: '📅', value: activeDays, label: t('summaryActiveDays') }
-            ]
+            scrollable: true,
+            items: items
         });
     }
 
@@ -477,7 +594,8 @@ class Presentation {
 
         this.slides.forEach((slide, index) => {
             const slideEl = document.createElement('div');
-            slideEl.className = `slide ${slide.theme} ${index === 0 ? 'active' : ''}`;
+            const scrollableClass = slide.scrollable ? 'slide-scrollable' : '';
+            slideEl.className = `slide ${slide.theme} ${scrollableClass} ${index === 0 ? 'active' : ''}`.replace(/\s+/g, ' ').trim();
             slideEl.innerHTML = this.renderSlideContent(slide);
             this.container.appendChild(slideEl);
         });
@@ -602,21 +720,23 @@ class Presentation {
      * Renderuj slajd podsumowania
      */
     renderSummarySlide(slide) {
-        let content = '<div class="summary-grid" style="display: flex; flex-direction: column; gap: 4px; margin-top: 5px; padding: 0 10px;">';
+        let content = '<div class="summary-scroll-container">';
+        content += '<div class="summary-grid">';
 
         slide.items.forEach(item => {
             content += `
-                <div style="display: flex; align-items: center; justify-content: space-between; padding: 5px 10px; background: rgba(0, 0, 0, 0.2); border-left: 3px solid var(--neon-green);">
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <div style="font-size: 0.85rem;">${item.icon}</div>
-                        <div style="font-size: 1.3rem; font-weight: 900; color: var(--neon-green); text-shadow: 0 0 10px var(--neon-green);">${item.value}</div>
+                <div class="summary-item">
+                    <div class="summary-item-icon">${item.icon}</div>
+                    <div class="summary-item-content">
+                        <div class="summary-item-value">${item.value}</div>
+                        <div class="summary-item-label">${item.label}</div>
+                        ${item.subtitle ? `<div class="summary-item-subtitle">${item.subtitle}</div>` : ''}
                     </div>
-                    <div style="font-size: 0.65rem; opacity: 0.8; text-transform: uppercase; letter-spacing: 1px; text-align: right;">${item.label}</div>
                 </div>
             `;
         });
 
-        content += '</div>';
+        content += '</div></div>';
         return content;
     }
 
