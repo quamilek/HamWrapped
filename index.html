@@ -18,6 +18,17 @@
                     <p class="subtitle">2025</p>
                 </div>
 
+                <div class="callsign-input">
+                    <label for="user-callsign">Twój znak wywoławczy:</label>
+                    <input type="text" id="user-callsign" placeholder="np. SP5XXX" maxlength="10">
+                </div>
+
+                <div class="user-locator-input">
+                    <label for="user-locator">Twój lokator:</label>
+                    <input type="text" id="user-locator" placeholder="np. KO02MC" maxlength="6">
+                    <p class="hint">Potrzebny do obliczenia odległości QSO</p>
+                </div>
+
                 <div class="upload-area" id="upload-area">
                     <div class="upload-icon">📁</div>
                     <h2>Wrzuć swój log ADIF</h2>
@@ -27,18 +38,6 @@
                         Wybierz plik
                         <input type="file" id="file-input" accept=".adi,.adif,.ADI,.ADIF" hidden>
                     </label>
-                </div>
-
-                <div class="callsign-input">
-                    <label for="user-callsign">Twój znak wywoławczy (opcjonalnie):</label>
-                    <input type="text" id="user-callsign" placeholder="np. SP5XXX" maxlength="10">
-                    <p class="hint">Potrzebny do obliczenia odległości QSO</p>
-                </div>
-
-                <div class="user-locator-input">
-                    <label for="user-locator">Twój lokator (opcjonalnie):</label>
-                    <input type="text" id="user-locator" placeholder="np. KO02MC" maxlength="6">
-                    <p class="hint">Potrzebny do obliczenia odległości QSO</p>
                 </div>
 
                 <div id="loading" class="loading hidden">

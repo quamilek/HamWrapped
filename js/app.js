@@ -149,8 +149,9 @@ class HamWrappedApp {
                 throw new Error('Nie znaleziono żadnych QSO w pliku');
             }
 
-            // Pobierz lokator użytkownika
+            // Pobierz lokator i callsign użytkownika
             const userLocator = document.getElementById('user-locator').value.trim() || null;
+            const userCallsign = document.getElementById('user-callsign').value.trim().toUpperCase() || null;
 
             // Określ rok (domyślnie najczęściej występujący w logu lub bieżący)
             const year = this.detectYear();
@@ -167,7 +168,7 @@ class HamWrappedApp {
             console.log('Statystyki:', this.stats);
 
             // Utwórz prezentację
-            this.presentation = new Presentation(this.stats, year);
+            this.presentation = new Presentation(this.stats, year, userCallsign);
             this.presentation.generateSlides();
 
             // Pokaż prezentację

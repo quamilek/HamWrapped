@@ -3,9 +3,10 @@
  */
 
 class Presentation {
-    constructor(stats, year) {
+    constructor(stats, year, userCallsign = null) {
         this.stats = stats;
         this.year = year;
+        this.userCallsign = userCallsign;
         this.slides = [];
         this.currentSlide = 0;
         this.container = document.getElementById('slides-container');
@@ -88,10 +89,14 @@ class Presentation {
      * Dodaj slajd intro
      */
     addIntroSlide() {
+        const title = this.userCallsign
+            ? `${this.userCallsign} - rok ${this.year}`
+            : `Twój rok ${this.year}`;
+
         this.slides.push({
             theme: 'theme-1',
             icon: '📻',
-            title: `Twój rok ${this.year}`,
+            title: title,
             value: 'HAM WRAPPED',
             description: 'Odkryj swoje krótkofalarskie podsumowanie roku!',
             subtitle: 'Przesuń, aby zobaczyć statystyki →'
@@ -426,14 +431,19 @@ class Presentation {
      * Slajd podsumowujący
      */
     addSummarySlide() {
+        const title = this.userCallsign
+            ? `${this.userCallsign} - ${this.year}`
+            : `Podsumowanie ${this.year}`;
+
         this.slides.push({
             theme: 'theme-2',
             icon: '🎉',
-            title: `Podsumowanie ${this.year}`,
+            title: title,
+            titleClass: 'title-large',
             type: 'summary',
             items: [
                 { icon: '📻', value: this.formatNumber(this.stats.totalQSOs), label: 'QSO' },
-                { icon: '🌍', value: this.stats.byDXCC.count, label: 'Krajów' },
+                { icon: '🌍', value: this.stats.byDXCC.count, label: 'DXCC' },
                 { icon: '📡', value: this.stats.byMode.sorted.length, label: 'Modów' },
                 { icon: '🌊', value: this.stats.byBand.count, label: 'Pasm' }
             ],
@@ -459,9 +469,10 @@ class Presentation {
      * Renderuj zawartość slajdu
      */
     renderSlideContent(slide) {
+        const titleClass = slide.titleClass ? `slide-title ${slide.titleClass}` : 'slide-title';
         let content = `
             <div class="slide-icon">${slide.icon}</div>
-            <div class="slide-title">${slide.title}</div>
+            <div class="${titleClass}">${slide.title}</div>
         `;
 
         if (slide.type === 'progress') {
