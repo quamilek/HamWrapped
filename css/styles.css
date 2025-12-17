@@ -531,7 +531,7 @@ body::before {
     position: fixed;
     top: 20px;
     right: 20px;
-    background: transparent;
+    background: rgba(10, 10, 26, 0.9);
     border: 2px solid var(--neon-yellow);
     color: var(--neon-yellow);
     padding: 10px 20px;
@@ -541,6 +541,7 @@ body::before {
     transition: all 0.3s ease;
     font-family: inherit;
     text-shadow: 0 0 10px var(--neon-yellow);
+    z-index: 9999;
 }
 
 .restart-btn:hover {
@@ -616,11 +617,12 @@ body::before {
 
     #presentation-section {
         padding: 10px;
+        padding-top: 45px;
         padding-bottom: 70px;
     }
 
     .slides-container {
-        height: calc(100vh - 90px);
+        height: calc(100vh - 130px);
         max-height: none;
     }
 
@@ -641,7 +643,7 @@ body::before {
     }
 
     .slide-title {
-        font-size: 1rem;
+        font-size: 2rem;
         letter-spacing: 1.5px;
         margin-bottom: 15px;
     }
@@ -705,10 +707,11 @@ body::before {
     }
 
     .restart-btn {
-        top: 8px;
-        right: 8px;
-        padding: 5px 10px;
-        font-size: 0.7rem;
+        top: 5px;
+        right: 5px;
+        padding: 4px 8px;
+        font-size: 0.6rem;
+        z-index: 100;
     }
 }
 
@@ -780,13 +783,19 @@ body::before {
    COMPREHENSIVE SUMMARY SLIDE STYLES
    ========================================== */
 
+/* Desktop - szerszy slajd podsumowania */
+@media (min-width: 501px) {
+    .slide-scrollable {
+        width: 170%;
+        left: -35%;
+    }
+}
+
 .slide-scrollable {
     overflow: hidden;
     justify-content: flex-start;
     padding-top: 20px;
     padding-bottom: 15px;
-    width: 170%;
-    left: -30%;
 }
 
 .slide-scrollable .slide-icon {
