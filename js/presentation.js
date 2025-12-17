@@ -78,7 +78,12 @@ class Presentation {
         // Slajd 17: Strefy CQ
         this.addCQZonesSlide();
 
-        // Slajd 18: Podsumowanie końcowe
+        // Slajd 18: Kontesty (jeśli są)
+        if (this.stats.contestActivity && this.stats.contestActivity.contests && this.stats.contestActivity.contests.length > 0) {
+            this.addContestsSlide();
+        }
+
+        // Slajd 19: Podsumowanie końcowe
         this.addSummarySlide();
 
         this.renderSlides();
@@ -434,6 +439,28 @@ class Presentation {
     }
 
     /**
+     * Slajd z kontestami
+     */
+    addContestsSlide() {
+        const contests = this.stats.contestActivity.contests;
+        const top5 = contests.slice(0, 5);
+
+        this.slides.push({
+            theme: 'theme-4',
+            icon: '🏅',
+            title: t('contestsTitle'),
+            value: contests.length,
+            description: t('contestsDescription', { count: contests.length }),
+            type: 'list',
+            items: top5.map(c => ({
+                label: c.contest,
+                value: `${this.formatNumber(c.count)} ${t('contestsQSO')}`
+            })),
+            subtitle: t('contestsSubtitle')
+        });
+    }
+
+    /**
      * Slajd podsumowujący - zbiera dane ze wszystkich slajdów
      */
     addSummarySlide() {
@@ -581,6 +608,16 @@ class Presentation {
                 value: this.stats.streaks.maxStreak,
                 label: t('streaksTitle'),
                 subtitle: t('streaksUnit')
+            });
+        }
+
+        // 15. Contests
+        if (this.stats.contestActivity && this.stats.contestActivity.contests && this.stats.contestActivity.contests.length > 0) {
+            items.push({
+                icon: '🏅',
+                value: this.stats.contestActivity.contests.length,
+                label: t('contestsTitle'),
+                subtitle: ''
             });
         }
 

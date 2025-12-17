@@ -111,6 +111,12 @@ const translations = {
         cqZonesDescription: 'Tyle stref CQ udało Ci się przepracować!',
         cqZonesSubtitle: 'Na świecie jest 40 stref CQ',
 
+        // Slajdy - kontesty
+        contestsTitle: 'Kontesty',
+        contestsDescription: 'Brałeś udział w {count} kontestach!',
+        contestsSubtitle: 'Top 5 kontestów z największą liczbą QSO',
+        contestsQSO: 'QSO',
+
         // Slajdy - podsumowanie
         summaryTitle: '{year} wrapped',
         summaryTitleWithCall: '{callsign} {year} wrapped',
@@ -249,6 +255,12 @@ const translations = {
         cqZonesTitle: 'CQ Zones',
         cqZonesDescription: 'You worked this many CQ zones!',
         cqZonesSubtitle: 'There are 40 CQ zones in the world',
+
+        // Slides - contests
+        contestsTitle: 'Contests',
+        contestsDescription: 'You participated in {count} contests!',
+        contestsSubtitle: 'Top 5 contests with most QSOs',
+        contestsQSO: 'QSO',
 
         // Slides - summary
         summaryTitle: '{year} wrapped',
