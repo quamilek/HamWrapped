@@ -9,6 +9,10 @@ class HamWrappedApp {
         this.qsos = [];
         this.stats = null;
 
+        // Swipe support variables
+        this.touchStartX = 0;
+        this.touchEndX = 0;
+
         this.init();
     }
 
@@ -104,25 +108,24 @@ class HamWrappedApp {
             }
         });
 
-        // Swipe support for mobile
-        let touchStartX = 0;
-        let touchEndX = 0;
+        // Swipe support for mobile - na całej sekcji prezentacji
+        const presentationSection = document.getElementById('presentation-section');
 
-        document.addEventListener('touchstart', (e) => {
-            touchStartX = e.changedTouches[0].screenX;
-        });
+        presentationSection.addEventListener('touchstart', (e) => {
+            this.touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
 
-        document.addEventListener('touchend', (e) => {
-            touchEndX = e.changedTouches[0].screenX;
+        presentationSection.addEventListener('touchend', (e) => {
+            this.touchEndX = e.changedTouches[0].screenX;
             this.handleSwipe();
-        });
+        }, { passive: true });
     }
 
     handleSwipe() {
         if (!this.presentation) return;
 
         const swipeThreshold = 50;
-        const diff = touchStartX - touchEndX;
+        const diff = this.touchStartX - this.touchEndX;
 
         if (diff > swipeThreshold) {
             this.presentation.nextSlide();

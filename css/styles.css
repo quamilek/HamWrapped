@@ -223,15 +223,29 @@ body {
 
 /* Presentation Section */
 #presentation-section {
-    position: relative;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     padding: 20px;
     padding-bottom: 100px;
+    overflow: hidden;
+    display: none;
+}
+
+#presentation-section.active {
+    display: flex;
 }
 
 .slides-container {
     width: 100%;
     max-width: 450px;
-    min-height: 600px;
+    height: calc(100vh - 150px);
+    max-height: 600px;
     position: relative;
 }
 
@@ -240,9 +254,9 @@ body {
     top: 0;
     left: 0;
     width: 100%;
-    min-height: 600px;
+    height: 100%;
     border-radius: 30px;
-    padding: 40px 30px;
+    padding: 30px 25px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -362,16 +376,18 @@ body {
 /* Navigation */
 .navigation {
     position: fixed;
-    bottom: 30px;
+    bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
     align-items: center;
     gap: 20px;
-    background: rgba(0, 0, 0, 0.3);
+    background: rgba(0, 0, 0, 0.6);
     padding: 15px 25px;
     border-radius: 50px;
     backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    z-index: 9999;
 }
 
 .nav-btn {
@@ -399,14 +415,24 @@ body {
     cursor: not-allowed;
 }
 
+/* Safe area support for iPhone */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+    .navigation {
+        padding-bottom: calc(15px + env(safe-area-inset-bottom));
+    }
+}
+
 .progress-dots {
     display: flex;
     gap: 8px;
+    max-width: 200px;
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
 .progress-dots .dot {
-    width: 10px;
-    height: 10px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.3);
     transition: all 0.3s ease;
@@ -414,7 +440,7 @@ body {
 
 .progress-dots .dot.active {
     background: white;
-    transform: scale(1.2);
+    transform: scale(1.3);
 }
 
 .restart-btn {
@@ -501,32 +527,134 @@ body {
         font-size: 2.2rem;
     }
 
+    #presentation-section {
+        padding: 10px;
+        padding-bottom: 70px;
+    }
+
+    .slides-container {
+        height: calc(100vh - 90px);
+        max-height: none;
+    }
+
+    .slide {
+        padding: 25px 20px;
+        border-radius: 24px;
+    }
+
+    .slide-icon {
+        font-size: 60px;
+        margin-bottom: 15px;
+    }
+
+    .slide-title {
+        font-size: 1rem;
+        letter-spacing: 1.5px;
+        margin-bottom: 15px;
+    }
+
     .slide-value {
         font-size: 3rem;
     }
 
     .slide-value.smaller {
-        font-size: 2rem;
+        font-size: 1.8rem;
     }
 
-    .slides-container {
-        min-height: 550px;
+    .slide-description {
+        font-size: 1rem;
     }
 
-    .slide {
-        min-height: 550px;
-        padding: 30px 20px;
+    .slide-subtitle {
+        font-size: 0.9rem;
+    }
+
+    .stat-list li {
+        padding: 10px 12px;
+        font-size: 0.9rem;
+    }
+
+    .progress-container .progress-item {
+        margin-bottom: 12px;
+    }
+
+    .progress-label {
+        font-size: 0.85rem;
     }
 
     .navigation {
-        padding: 10px 15px;
-        gap: 10px;
+        position: fixed;
+        bottom: 8px;
+        padding: 6px 10px;
+        gap: 6px;
+        border-radius: 25px;
     }
 
     .nav-btn {
-        width: 40px;
-        height: 40px;
-        font-size: 1.2rem;
+        width: 32px;
+        height: 32px;
+        font-size: 0.9rem;
+    }
+
+    .progress-dots {
+        max-width: 120px;
+        gap: 4px;
+    }
+
+    .progress-dots .dot {
+        width: 5px;
+        height: 5px;
+    }
+
+    .restart-btn {
+        top: 8px;
+        right: 8px;
+        padding: 5px 10px;
+        font-size: 0.7rem;
+    }
+}
+
+/* Very small screens (iPhone SE, etc.) */
+@media (max-height: 600px) {
+    #presentation-section {
+        padding-bottom: 65px;
+    }
+
+    .slides-container {
+        height: calc(100vh - 80px);
+    }
+
+    .slide {
+        padding: 20px 15px;
+    }
+
+    .slide-icon {
+        font-size: 50px;
+        margin-bottom: 10px;
+    }
+
+    .slide-title {
+        font-size: 0.9rem;
+        margin-bottom: 10px;
+    }
+
+    .slide-value {
+        font-size: 2.5rem;
+    }
+
+    .slide-value.smaller {
+        font-size: 1.5rem;
+    }
+
+    .navigation {
+        bottom: 5px;
+        padding: 5px 8px;
+    }
+
+    .nav-btn {
+        width: 28px;
+        height: 28px;
+        font-size: 0.8rem;
     }
 }
 
