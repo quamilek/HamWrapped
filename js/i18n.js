@@ -60,6 +60,8 @@ const translations = {
         favoriteBandTitle: 'Ulubione pasmo',
         favoriteBandDescription: '{percentage}% łączności',
         favoriteBandSubtitle: 'Pracowałeś na {count} różnych pasmach',
+        bandDistributionTitle: 'Rozkład pasm',
+        bandDistributionSubtitle: 'Pracowałeś na {count} pasmach',
 
         // Slajdy - kontynenty
         continentsTitle: 'Kontynenty',
@@ -205,6 +207,8 @@ const translations = {
         favoriteBandTitle: 'Favorite band',
         favoriteBandDescription: '{percentage}% of contacts',
         favoriteBandSubtitle: 'You worked on {count} different bands',
+        bandDistributionTitle: 'Band distribution',
+        bandDistributionSubtitle: 'You worked on {count} bands',
 
         // Slides - continents
         continentsTitle: 'Continents',

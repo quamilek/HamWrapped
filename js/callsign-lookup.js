@@ -19,21 +19,21 @@ function parseCtyDat(ctyContent) {
     CTY_DATABASE = [];
     PREFIX_INDEX = {};
     EXACT_CALLSIGN_INDEX = {};
-    
+
     const lines = ctyContent.split('\n');
     let currentEntity = null;
     let aliasBuffer = '';
-    
+
     for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
-        
+
         // Linia nagłówka encji (zaczyna się od nazwy kraju, nie od spacji)
         if (line.length > 0 && line[0] !== ' ' && line.includes(':')) {
             // Zapisz poprzednią encję jeśli istnieje
             if (currentEntity && aliasBuffer) {
                 parseAliases(currentEntity, aliasBuffer);
             }
-            
+
             // Parsuj nową encję
             currentEntity = parseEntityHeader(line);
             if (currentEntity) {
@@ -45,15 +45,15 @@ function parseCtyDat(ctyContent) {
             aliasBuffer += line.trim();
         }
     }
-    
+
     // Zapisz ostatnią encję
     if (currentEntity && aliasBuffer) {
         parseAliases(currentEntity, aliasBuffer);
     }
-    
+
     // Buduj posortowany indeks prefiksów
     buildSortedPrefixIndex();
-    
+
     CTY_LOADED = true;
     console.log(`Załadowano CTY.DAT: ${CTY_DATABASE.length} encji DXCC, ${SORTED_PREFIXES.length} prefiksów, ${Object.keys(EXACT_CALLSIGN_INDEX).length} dokładnych callsignów`);
 }
@@ -66,7 +66,7 @@ function parseEntityHeader(line) {
     // Podziel po dwukropkach
     const parts = line.split(':');
     if (parts.length < 8) return null;
-    
+
     const name = parts[0].trim();
     const cqZone = parseInt(parts[1].trim(), 10);
     const ituZone = parseInt(parts[2].trim(), 10);
@@ -75,13 +75,13 @@ function parseEntityHeader(line) {
     const lon = parseFloat(parts[5].trim()) * -1; // CTY używa West jako +, my chcemy East jako +
     const tz = parseFloat(parts[6].trim());
     let primaryPrefix = parts[7].trim();
-    
+
     // Usuń gwiazdkę z prefiksu (oznacza WAEDC)
     const isWaedc = primaryPrefix.startsWith('*');
     if (isWaedc) {
         primaryPrefix = primaryPrefix.substring(1);
     }
-    
+
     return {
         name,
         cqZone,
@@ -104,36 +104,36 @@ function parseAliases(entity, aliasString) {
     // Usuń średnik końcowy i podziel po przecinkach
     aliasString = aliasString.replace(/;$/, '').trim();
     const aliases = aliasString.split(',').map(a => a.trim()).filter(a => a);
-    
+
     for (const alias of aliases) {
         if (!alias) continue;
-        
+
         let prefix = alias;
         let overrides = {};
-        
+
         // Wyciągnij override'y: (#) CQ zone, [#] ITU zone, {aa} continent, <lat/lon>, ~tz~
-        
+
         // Override CQ zone: (nn)
         const cqMatch = prefix.match(/\((\d+)\)/);
         if (cqMatch) {
             overrides.cqZone = parseInt(cqMatch[1], 10);
             prefix = prefix.replace(/\(\d+\)/, '');
         }
-        
+
         // Override ITU zone: [nn]
         const ituMatch = prefix.match(/\[(\d+)\]/);
         if (ituMatch) {
             overrides.ituZone = parseInt(ituMatch[1], 10);
             prefix = prefix.replace(/\[\d+\]/, '');
         }
-        
+
         // Override continent: {aa}
         const contMatch = prefix.match(/\{([A-Z]{2})\}/);
         if (contMatch) {
             overrides.continent = contMatch[1];
             prefix = prefix.replace(/\{[A-Z]{2}\}/, '');
         }
-        
+
         // Override lat/lon: <lat/lon>
         const latLonMatch = prefix.match(/<([^>]+)>/);
         if (latLonMatch) {
@@ -144,22 +144,22 @@ function parseAliases(entity, aliasString) {
             }
             prefix = prefix.replace(/<[^>]+>/, '');
         }
-        
+
         // Override timezone: ~tz~
         const tzMatch = prefix.match(/~([^~]+)~/);
         if (tzMatch) {
             overrides.tz = parseFloat(tzMatch[1]);
             prefix = prefix.replace(/~[^~]+~/, '');
         }
-        
+
         // Czy to dokładny callsign (zaczyna się od =)?
         const isExactCall = prefix.startsWith('=');
         if (isExactCall) {
             prefix = prefix.substring(1);
         }
-        
+
         prefix = prefix.toUpperCase();
-        
+
         if (isExactCall) {
             entity.exactCalls.push(prefix);
             EXACT_CALLSIGN_INDEX[prefix] = {
@@ -192,32 +192,32 @@ function buildSortedPrefixIndex() {
  */
 function lookupCallsign(callsign) {
     if (!callsign || !CTY_LOADED) return null;
-    
+
     callsign = callsign.toUpperCase().trim();
-    
+
     // 1. Sprawdź dokładne dopasowanie callsigna
     if (EXACT_CALLSIGN_INDEX[callsign]) {
         return buildResult(EXACT_CALLSIGN_INDEX[callsign]);
     }
-    
+
     // 2. Obsłuż callsigny z ukośnikiem (np. EA8/SP3WKW, SP3WKW/P)
     let searchCall = callsign;
     if (callsign.includes('/')) {
         searchCall = resolvePortableCallsign(callsign);
     }
-    
+
     // 3. Sprawdź dokładne dopasowanie po rozwiązaniu portable
     if (searchCall !== callsign && EXACT_CALLSIGN_INDEX[searchCall]) {
         return buildResult(EXACT_CALLSIGN_INDEX[searchCall]);
     }
-    
+
     // 4. Szukaj najdłuższego pasującego prefiksu
     for (const prefix of SORTED_PREFIXES) {
         if (searchCall.startsWith(prefix)) {
             return buildResult(PREFIX_INDEX[prefix]);
         }
     }
-    
+
     // 5. Jeśli nie znaleziono, spróbuj z oryginalnym callsign
     if (searchCall !== callsign) {
         for (const prefix of SORTED_PREFIXES) {
@@ -226,7 +226,7 @@ function lookupCallsign(callsign) {
             }
         }
     }
-    
+
     return null;
 }
 
@@ -235,27 +235,27 @@ function lookupCallsign(callsign) {
  */
 function resolvePortableCallsign(callsign) {
     const parts = callsign.split('/');
-    
+
     // Typowe sufiksy do ignorowania
     const suffixes = ['P', 'M', 'MM', 'AM', 'QRP', 'A', 'B', 'LH', 'LGT', 'J', 'T', 'G', 'E',
                       '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
-    
+
     if (parts.length === 2) {
         // Format: PREFIX/CALL lub CALL/SUFFIX
         const first = parts[0];
         const second = parts[1];
-        
+
         // Jeśli druga część to typowy sufiks, użyj pierwszej
         if (suffixes.includes(second) || second.length === 1) {
             return first;
         }
-        
+
         // Jeśli pierwsza część jest krótka (1-4 znaki) i nie wygląda jak callsign, to prefix
         if (first.length <= 4 && !first.match(/\d[A-Z]{2,}$/)) {
             // Format: EA8/SP3WKW - użyj prefiksu EA8
             return first;
         }
-        
+
         // Jeśli druga część jest krótka i nie jest sufiksem, może być prefiksem
         if (second.length <= 4 && !suffixes.includes(second) && !second.match(/\d[A-Z]{2,}$/)) {
             // Format: SP3WKW/EA8 - użyj prefiksu EA8
@@ -266,11 +266,11 @@ function resolvePortableCallsign(callsign) {
                 }
             }
         }
-        
+
         // Domyślnie użyj pierwszej części
         return first;
     }
-    
+
     // Więcej niż 2 części - użyj pierwszej która pasuje do prefiksu
     for (const part of parts) {
         for (const prefix of SORTED_PREFIXES) {
@@ -279,7 +279,7 @@ function resolvePortableCallsign(callsign) {
             }
         }
     }
-    
+
     return parts[0];
 }
 
@@ -289,7 +289,7 @@ function resolvePortableCallsign(callsign) {
 function buildResult(match) {
     const entity = match.entity;
     const overrides = match.overrides || {};
-    
+
     return {
         country: entity.name,
         continent: overrides.continent || entity.continent,
@@ -377,18 +377,18 @@ const PREFIX_TO_DXCC = {
 function getDxccCode(prefix) {
     // Normalizuj prefix
     prefix = prefix.replace(/^\*/, '');
-    
+
     // Sprawdź dokładne dopasowanie
     if (PREFIX_TO_DXCC[prefix]) {
         return PREFIX_TO_DXCC[prefix];
     }
-    
+
     // Sprawdź bez wariantów (np. "CE" zamiast "CE0X")
     const basePrefix = prefix.replace(/\/.*$/, '').replace(/[0-9]+$/, '');
     if (PREFIX_TO_DXCC[basePrefix]) {
         return PREFIX_TO_DXCC[basePrefix];
     }
-    
+
     return null;
 }
 

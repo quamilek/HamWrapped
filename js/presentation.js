@@ -43,7 +43,10 @@ class Presentation {
         // Slajd 8: Ulubione pasmo
         this.addFavoriteBandSlide();
 
-        // Slajd 9: Kontynenty
+        // Slajd 9: Dystrybucja pasm
+        this.addBandDistributionSlide();
+
+        // Slajd 10: Kontynenty
         this.addContinentsSlide();
 
         // Slajd 10: Top DXCC
@@ -222,6 +225,31 @@ class Presentation {
             value: fav.band,
             description: t('favoriteBandDescription', { percentage: fav.percentage }),
             subtitle: t('favoriteBandSubtitle', { count: this.stats.byBand.count })
+        });
+    }
+
+    /**
+     * Slajd z dystrybucją pasm
+     */
+    addBandDistributionSlide() {
+        const bands = this.stats.byBand?.sorted || [];
+
+        if (bands.length === 0) return;
+
+        // Pokaż wszystkie pasma
+        const topBands = bands;
+
+        this.slides.push({
+            theme: 'theme-9',
+            icon: '📊',
+            title: t('bandDistributionTitle'),
+            type: 'progress',
+            subtitle: t('bandDistributionSubtitle', { count: this.stats.byBand.count }),
+            items: topBands.map(b => ({
+                label: b.band,
+                value: `${b.percentage}%`,
+                percentage: parseFloat(b.percentage)
+            }))
         });
     }
 
@@ -526,6 +554,18 @@ class Presentation {
             label: t('favoriteBandTitle'),
             subtitle: `${this.stats.byBand.count} ${i18n.currentLang === 'pl' ? 'pasm' : 'bands'}`
         });
+
+        // 6b. Band distribution (top 3)
+        const topBands = this.stats.byBand.sorted?.slice(0, 3) || [];
+        if (topBands.length > 0) {
+            const bandList = topBands.map(b => `${b.band}: ${b.percentage}%`).join(', ');
+            items.push({
+                icon: '📊',
+                value: this.stats.byBand.count,
+                label: t('bandDistributionTitle'),
+                subtitle: bandList
+            });
+        }
 
         // 7. Continents
         const continents = this.stats.byContinent ? this.stats.byContinent.count : 0;
