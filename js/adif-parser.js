@@ -43,12 +43,100 @@ class ADIFParser {
             }
         }
 
-        console.log(`Parsed ${this.qsos.length} QSOs`);
+        console.log(`Parsed ${this.qsos.length} QSOs total`);
         if (this.qsos.length > 0) {
-            console.log('Przykładowe QSO:', this.qsos[0]);
-            console.log('Ostatnie QSO:', this.qsos[this.qsos.length - 1]);
+            console.log('Sample QSO:', this.qsos[0]);
+            console.log('Last QSO:', this.qsos[this.qsos.length - 1]);
         }
+
+        // Check and log QSOs from other years
+        this.checkNon2025QSOs();
+
+        // Filter to keep only 2025 QSOs
+        this.filterTo2025();
+
         return this.qsos;
+    }
+
+    /**
+     * Filters QSOs to keep only those from 2025
+     */
+    filterTo2025() {
+        const totalBefore = this.qsos.length;
+        
+        this.qsos = this.qsos.filter(qso => {
+            // Use dateRaw (original string YYYYMMDD) or date object
+            if (qso.dateRaw) {
+                return qso.dateRaw.startsWith('2025');
+            }
+            if (qso.date && qso.date.year) {
+                return qso.date.year === 2025;
+            }
+            return false;
+        });
+
+        const filtered = totalBefore - this.qsos.length;
+        if (filtered > 0) {
+            console.log(`📅 Filtered out ${filtered} QSOs from years other than 2025`);
+        }
+        console.log(`📊 Using ${this.qsos.length} QSOs from 2025 for Wrapped`);
+    }
+
+    /**
+     * Checks and logs QSOs from years other than 2025
+     */
+    checkNon2025QSOs() {
+        const qsosByYear = {};
+        
+        this.qsos.forEach(qso => {
+            let year = null;
+            
+            // Get year from dateRaw (original YYYYMMDD string) or date object
+            if (qso.dateRaw) {
+                year = qso.dateRaw.substring(0, 4);
+            } else if (qso.date && qso.date.year) {
+                year = String(qso.date.year);
+            }
+            
+            if (year) {
+                if (!qsosByYear[year]) {
+                    qsosByYear[year] = [];
+                }
+                qsosByYear[year].push(qso);
+            }
+        });
+
+        const years = Object.keys(qsosByYear).sort();
+        console.log('=== YEAR ANALYSIS IN LOG ===');
+        console.log(`Years found: ${years.join(', ')}`);
+        
+        years.forEach(year => {
+            const count = qsosByYear[year].length;
+            const percentage = ((count / this.qsos.length) * 100).toFixed(1);
+            const marker = year !== '2025' ? ' ⚠️ NOT 2025!' : ' ✓';
+            console.log(`  ${year}: ${count} QSO (${percentage}%)${marker}`);
+        });
+
+        const non2025Years = years.filter(y => y !== '2025');
+        if (non2025Years.length > 0) {
+            console.warn('⚠️ WARNING: Log contains QSOs from years other than 2025:');
+            non2025Years.forEach(year => {
+                const qsos = qsosByYear[year];
+                console.warn(`  Year ${year}: ${qsos.length} QSO`);
+                // Show first 5 example QSOs from this year
+                const examples = qsos.slice(0, 5);
+                examples.forEach(qso => {
+                    const dateStr = qso.dateRaw || `${qso.date.year}-${qso.date.month}-${qso.date.day}`;
+                    console.warn(`    - ${dateStr} ${qso.call} ${qso.band || ''} ${qso.mode || ''}`);
+                });
+                if (qsos.length > 5) {
+                    console.warn(`    ... and ${qsos.length - 5} more`);
+                }
+            });
+        } else {
+            console.log('✓ All QSOs are from 2025');
+        }
+        console.log('=== END OF YEAR ANALYSIS ===');
     }
 
     /**
