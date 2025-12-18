@@ -322,6 +322,7 @@ const DXCC_DATABASE = {
 // Indeks prefiksów dla szybkiego wyszukiwania
 // Budowany automatycznie z DXCC_DATABASE
 let PREFIX_INDEX = null;
+let SORTED_PREFIXES = null; // Prefiksy posortowane od najdłuższych
 
 /**
  * Buduje indeks prefiksów dla szybkiego wyszukiwania
@@ -329,16 +330,24 @@ let PREFIX_INDEX = null;
  */
 function buildPrefixIndex() {
     PREFIX_INDEX = {};
+    const allPrefixes = [];
 
     for (const [dxccId, data] of Object.entries(DXCC_DATABASE)) {
         for (const prefix of data.prefixes) {
-            PREFIX_INDEX[prefix] = {
+            const entry = {
+                prefix: prefix,
                 dxcc: parseInt(dxccId),
                 continent: data.continent,
                 country: data.name
             };
+            PREFIX_INDEX[prefix] = entry;
+            allPrefixes.push(prefix);
         }
     }
+
+    // Sortuj prefiksy od najdłuższych do najkrótszych
+    // Dzięki temu SV9 będzie sprawdzony przed SV
+    SORTED_PREFIXES = allPrefixes.sort((a, b) => b.length - a.length);
 
     console.log(`Zbudowano indeks prefiksów: ${Object.keys(PREFIX_INDEX).length} prefiksów`);
 }
@@ -352,7 +361,7 @@ function lookupCallsign(callsign) {
     if (!callsign) return null;
 
     // Zbuduj indeks jeśli nie istnieje
-    if (!PREFIX_INDEX) {
+    if (!PREFIX_INDEX || !SORTED_PREFIXES) {
         buildPrefixIndex();
     }
 
@@ -361,54 +370,43 @@ function lookupCallsign(callsign) {
     // Obsłuż callsigny z ukośnikiem (np. SP3WKW/P, EA8/SP3WKW)
     const parts = callsign.split('/');
     let mainCall = parts[0];
+    let prefixOverride = null;
 
     // Jeśli jest ukośnik, sprawdź czy pierwsza część to prefix kraju
     if (parts.length > 1) {
         // Typowe sufiksy do ignorowania
-        const suffixes = ['P', 'M', 'MM', 'AM', 'QRP', 'A', 'B', 'LH', 'LGT'];
+        const suffixes = ['P', 'M', 'MM', 'AM', 'QRP', 'A', 'B', 'LH', 'LGT', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
 
         // Sprawdź czy pierwsza część to prefix kraju (krótka, 1-4 znaki i nie jest sufiksem)
         if (parts[0].length <= 4 && !suffixes.includes(parts[0])) {
-            // Format prefix/call (np. EA8/SP3WKW) - użyj prefiksu
-            for (let len = Math.min(parts[0].length, 5); len >= 1; len--) {
-                const prefix = parts[0].substring(0, len);
-                if (PREFIX_INDEX[prefix]) {
-                    return PREFIX_INDEX[prefix];
-                }
-            }
+            // Format prefix/call (np. EA8/SP3WKW) - prefix określa kraj
+            prefixOverride = parts[0];
+        } else if (parts.length === 2 && !suffixes.includes(parts[1]) && parts[1].length <= 4) {
+            // Format call/prefix (np. SP3WKW/EA8) - prefix na końcu określa kraj
+            prefixOverride = parts[1];
         }
     }
 
-    // Sprawdź prefiksy od najdłuższego (5 znaków) do najkrótszego (1 znak)
-    for (let len = Math.min(mainCall.length, 5); len >= 1; len--) {
-        const prefix = mainCall.substring(0, len);
-        if (PREFIX_INDEX[prefix]) {
+    // Jeśli mamy override prefiksu, użyj go
+    const searchCall = prefixOverride || mainCall;
+
+    // Sprawdź wszystkie prefiksy od najdłuższych do najkrótszych
+    for (const prefix of SORTED_PREFIXES) {
+        if (searchCall.startsWith(prefix)) {
             return PREFIX_INDEX[prefix];
         }
     }
 
     // Specjalne przypadki - callsigny zaczynające się od cyfry
-    // np. 9A1A, 4O3A, 3Z0R
-    if (mainCall.length >= 2 && /^\d/.test(mainCall)) {
-        // Spróbuj 2-znakowy prefix (np. 9A, 4O, 3Z)
-        const twoChar = mainCall.substring(0, 2);
-        if (PREFIX_INDEX[twoChar]) {
-            return PREFIX_INDEX[twoChar];
-        }
-
-        // Spróbuj 3-znakowy prefix z cyfrą na końcu (np. 3DA)
-        if (mainCall.length >= 3) {
-            const threeChar = mainCall.substring(0, 3);
-            if (PREFIX_INDEX[threeChar]) {
-                return PREFIX_INDEX[threeChar];
+    // np. 9A1A, 4O3A, 3Z0R - te mogą nie pasować do startsWith
+    if (searchCall.length >= 2 && /^\d/.test(searchCall)) {
+        // Sprawdź 2, 3, 4 znakowe prefiksy zaczynające się od cyfry
+        for (let len = Math.min(searchCall.length, 4); len >= 2; len--) {
+            const prefix = searchCall.substring(0, len);
+            if (PREFIX_INDEX[prefix]) {
+                return PREFIX_INDEX[prefix];
             }
         }
-    }
-
-    // Ostatnia próba - pierwszy znak jako prefix
-    const firstChar = mainCall[0];
-    if (PREFIX_INDEX[firstChar]) {
-        return PREFIX_INDEX[firstChar];
     }
 
     console.warn(`Nie znaleziono DXCC dla callsigna: ${callsign}`);

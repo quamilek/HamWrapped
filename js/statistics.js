@@ -256,9 +256,16 @@ class StatisticsCalculator {
         this.qsos.forEach(qso => {
             let continent = qso.continent;
 
-            // Jeśli brak kontynentu w QSO, spróbuj pobrać z DXCC
-            if (!continent && qso.dxcc && DXCC_DATA[qso.dxcc]) {
-                continent = DXCC_DATA[qso.dxcc].continent;
+            // Jeśli brak kontynentu w QSO, spróbuj pobrać z DXCC lub nazwy kraju
+            if (!continent) {
+                if (qso.dxcc && DXCC_DATA[qso.dxcc]) {
+                    continent = DXCC_DATA[qso.dxcc].continent;
+                } else if (qso.country && window.findDxccByName) {
+                    const dxccInfo = window.findDxccByName(qso.country);
+                    if (dxccInfo) {
+                        continent = dxccInfo.continent;
+                    }
+                }
             }
 
             if (continent) {
@@ -338,9 +345,16 @@ class StatisticsCalculator {
         this.qsos.forEach(qso => {
             let zone = qso.cqZone;
 
-            // Jeśli brak strefy w QSO, spróbuj pobrać z DXCC
-            if (!zone && qso.dxcc && DXCC_DATA[qso.dxcc]) {
-                zone = DXCC_DATA[qso.dxcc].cqZone;
+            // Jeśli brak strefy w QSO, spróbuj pobrać z DXCC lub nazwy kraju
+            if (!zone) {
+                if (qso.dxcc && DXCC_DATA[qso.dxcc]) {
+                    zone = DXCC_DATA[qso.dxcc].cqZone;
+                } else if (qso.country && window.findDxccByName) {
+                    const dxccInfo = window.findDxccByName(qso.country);
+                    if (dxccInfo) {
+                        zone = dxccInfo.cqZone;
+                    }
+                }
             }
 
             // Walidacja: strefa CQ musi być liczbą od 1 do 40
@@ -380,10 +394,17 @@ class StatisticsCalculator {
                 targetCoords = this.locatorToCoords(qso.gridsquare);
             }
 
-            // Jeśli brak, użyj współrzędnych DXCC
-            if (!targetCoords && qso.dxcc && DXCC_DATA[qso.dxcc]) {
-                const dxcc = DXCC_DATA[qso.dxcc];
-                targetCoords = { lat: dxcc.lat, lon: dxcc.lon };
+            // Jeśli brak, użyj współrzędnych DXCC (najpierw po ID, potem po nazwie)
+            if (!targetCoords) {
+                let dxccInfo = null;
+                if (qso.dxcc && DXCC_DATA[qso.dxcc]) {
+                    dxccInfo = DXCC_DATA[qso.dxcc];
+                } else if (qso.country && window.findDxccByName) {
+                    dxccInfo = window.findDxccByName(qso.country);
+                }
+                if (dxccInfo && dxccInfo.lat && dxccInfo.lon) {
+                    targetCoords = { lat: dxccInfo.lat, lon: dxccInfo.lon };
+                }
             }
 
             if (targetCoords) {
@@ -435,15 +456,21 @@ class StatisticsCalculator {
             const defaultUserCoords = { lat: 52.0, lon: 20.0 };
 
             this.qsos.forEach(qso => {
+                let dxccInfo = null;
                 if (qso.dxcc && DXCC_DATA[qso.dxcc]) {
-                    const dxcc = DXCC_DATA[qso.dxcc];
-                    const targetCoords = { lat: dxcc.lat, lon: dxcc.lon };
+                    dxccInfo = DXCC_DATA[qso.dxcc];
+                } else if (qso.country && window.findDxccByName) {
+                    dxccInfo = window.findDxccByName(qso.country);
+                }
+
+                if (dxccInfo && dxccInfo.lat && dxccInfo.lon) {
+                    const targetCoords = { lat: dxccInfo.lat, lon: dxccInfo.lon };
                     const distance = this.calculateDistance(defaultUserCoords, targetCoords);
 
                     if (distance > maxDistance) {
                         maxDistance = distance;
                         // Priorytet: qso.country (z callsign lookup), potem DXCC_DATA
-                        let countryName = qso.country || dxcc.name;
+                        let countryName = qso.country || dxccInfo.name;
                         odxQSO = {
                             ...qso,
                             distance,
@@ -478,9 +505,17 @@ class StatisticsCalculator {
                 targetCoords = this.locatorToCoords(qso.gridsquare);
             }
 
-            if (!targetCoords && qso.dxcc && DXCC_DATA[qso.dxcc]) {
-                const dxcc = DXCC_DATA[qso.dxcc];
-                targetCoords = { lat: dxcc.lat, lon: dxcc.lon };
+            // Jeśli brak gridsquare, użyj współrzędnych DXCC
+            if (!targetCoords) {
+                let dxccInfo = null;
+                if (qso.dxcc && DXCC_DATA[qso.dxcc]) {
+                    dxccInfo = DXCC_DATA[qso.dxcc];
+                } else if (qso.country && window.findDxccByName) {
+                    dxccInfo = window.findDxccByName(qso.country);
+                }
+                if (dxccInfo && dxccInfo.lat && dxccInfo.lon) {
+                    targetCoords = { lat: dxccInfo.lat, lon: dxccInfo.lon };
+                }
             }
 
             if (targetCoords) {
