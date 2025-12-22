@@ -28,7 +28,10 @@ class Presentation {
         // Slajd 3: Unikalne callsigns
         this.addUniqueCallsignsSlide();
 
-        // Slajd 4: Najlepszy miesiąc
+        // Slajd 4: Top callsigns
+        this.addTopCallsignsSlide();
+
+        // Slajd 5: Najlepszy miesiąc
         this.addBestMonthSlide();
 
         // Slajd 5: Najlepszy dzień
@@ -137,6 +140,28 @@ class Presentation {
             value: this.formatNumber(this.stats.uniqueCallsigns.count),
             description: t('uniqueCallsignsDescription'),
             subtitle: t('uniqueCallsignsSubtitle', { avg: avg })
+        });
+    }
+
+    /**
+     * Slajd z top callsigns
+     */
+    addTopCallsignsSlide() {
+        const topCalls = this.stats.topCallsigns?.top5 || [];
+
+        if (topCalls.length === 0) return;
+
+        this.slides.push({
+            theme: 'theme-4',
+            icon: '🏅',
+            title: t('topCallsignsTitle'),
+            type: 'list',
+            subtitle: t('topCallsignsSubtitle'),
+            items: topCalls.map((item, index) => ({
+                rank: index + 1,
+                label: item.call,
+                value: `${item.count} QSO`
+            }))
         });
     }
 
@@ -515,6 +540,17 @@ class Presentation {
             label: t('uniqueCallsignsTitle'),
             subtitle: `${avgPerStation} QSO/${i18n.currentLang === 'pl' ? 'stację' : 'station'}`
         });
+
+        // 2b. Favorite station (most QSOs)
+        const favStation = this.stats.topCallsigns?.favorite;
+        if (favStation) {
+            items.push({
+                icon: '🏅',
+                value: favStation.call,
+                label: t('favoriteStationTitle'),
+                subtitle: `${favStation.count} QSO`
+            });
+        }
 
         // 3. Best month
         const bestMonth = this.stats.byMonth.best;

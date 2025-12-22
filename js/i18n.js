@@ -41,6 +41,11 @@ const translations = {
         uniqueCallsignsDescription: 'Rozmawiałeś z tyloma różnymi stacjami!',
         uniqueCallsignsSubtitle: 'To średnio {avg} QSO na stację',
 
+        // Slajdy - top callsigns
+        topCallsignsTitle: 'Top 5 stacji',
+        topCallsignsSubtitle: 'Stacje z którymi miałeś najwięcej QSO',
+        favoriteStationTitle: 'Ulubiona stacja',
+
         // Slajdy - miesiąc
         bestMonthTitle: 'Twój najlepszy miesiąc',
         bestMonthDescription: '{count} QSO w tym miesiącu!',
@@ -187,6 +192,11 @@ const translations = {
         uniqueCallsignsTitle: 'Unique stations',
         uniqueCallsignsDescription: 'You talked to this many different stations!',
         uniqueCallsignsSubtitle: 'That\'s an average of {avg} QSOs per station',
+
+        // Slides - top callsigns
+        topCallsignsTitle: 'Top 5 stations',
+        topCallsignsSubtitle: 'Stations you had the most QSOs with',
+        favoriteStationTitle: 'Favorite station',
 
         // Slides - month
         bestMonthTitle: 'Your best month',

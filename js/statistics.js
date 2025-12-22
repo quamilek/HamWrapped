@@ -16,6 +16,7 @@ class StatisticsCalculator {
         this.stats = {
             totalQSOs: this.calculateTotalQSOs(),
             uniqueCallsigns: this.calculateUniqueCallsigns(),
+            topCallsigns: this.calculateTopCallsigns(),
             byMonth: this.calculateByMonth(),
             byDay: this.calculateByDay(),
             byDayOfWeek: this.calculateByDayOfWeek(),
@@ -56,6 +57,34 @@ class StatisticsCalculator {
         return {
             count: callsigns.size,
             list: Array.from(callsigns)
+        };
+    }
+
+    /**
+     * Top callsigns - stacje z największą liczbą QSO
+     */
+    calculateTopCallsigns() {
+        const callsignCounts = {};
+
+        this.qsos.forEach(qso => {
+            if (qso.call) {
+                callsignCounts[qso.call] = (callsignCounts[qso.call] || 0) + 1;
+            }
+        });
+
+        // Sortuj według liczby QSO malejąco
+        const sorted = Object.entries(callsignCounts)
+            .sort((a, b) => b[1] - a[1])
+            .map(([call, count]) => ({
+                call,
+                count,
+                percentage: ((count / this.qsos.length) * 100).toFixed(1)
+            }));
+
+        return {
+            top5: sorted.slice(0, 5),
+            top10: sorted.slice(0, 10),
+            favorite: sorted[0] || null
         };
     }
 
