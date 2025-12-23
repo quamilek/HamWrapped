@@ -22,9 +22,64 @@ class HamWrappedApp {
             i18n.updatePageTexts();
         }
 
+        // Sprawdź czy URL zawiera zakodowane statystyki
+        this.checkUrlForStats();
+
         this.setupFileUpload();
         this.setupNavigation();
         this.setupKeyboardNavigation();
+        this.setupShareButton();
+    }
+
+    /**
+     * Sprawdza czy URL zawiera zakodowane statystyki i jeśli tak, wyświetla je
+     */
+    checkUrlForStats() {
+        const urlData = window.getStatsFromUrl ? getStatsFromUrl() : null;
+        if (urlData && urlData.stats) {
+            console.log('📊 Loading stats from URL...', urlData);
+            this.stats = urlData.stats;
+            
+            // Ustaw callsign w polu
+            if (urlData.userCallsign) {
+                document.getElementById('user-callsign').value = urlData.userCallsign;
+            }
+
+            // Utwórz prezentację
+            this.presentation = new Presentation(this.stats, urlData.year, urlData.userCallsign);
+            this.presentation.generateSlides();
+
+            // Przejdź do prezentacji
+            document.getElementById('upload-section').classList.remove('active');
+            document.getElementById('presentation-section').classList.add('active');
+
+            // Pokaż przycisk udostępniania
+            const shareBtn = document.getElementById('share-btn');
+            if (shareBtn) shareBtn.classList.remove('hidden');
+
+            console.log('✓ Stats loaded from URL');
+        }
+    }
+
+    /**
+     * Konfiguracja przycisku udostępniania
+     */
+    setupShareButton() {
+        const shareBtn = document.getElementById('share-btn');
+        if (shareBtn) {
+            shareBtn.addEventListener('click', async () => {
+                const success = await copyShareLink();
+                if (success) {
+                    const originalText = shareBtn.innerHTML;
+                    shareBtn.innerHTML = '✓ <span>' + (i18n.currentLang === 'pl' ? 'Skopiowano!' : 'Copied!') + '</span>';
+                    shareBtn.classList.add('copied');
+                    setTimeout(() => {
+                        shareBtn.innerHTML = originalText;
+                        shareBtn.classList.remove('copied');
+                    }, 2000);
+                }
+            });
+        }
     }
 
     /**
@@ -180,8 +235,18 @@ class HamWrappedApp {
             this.presentation = new Presentation(this.stats, year, userCallsign);
             this.presentation.generateSlides();
 
+            // Zakoduj statystyki w URL do udostępnienia
+            if (window.updateUrlWithStats) {
+                const shareUrl = updateUrlWithStats(this.stats, userCallsign, year);
+                console.log('📎 Share URL generated:', shareUrl);
+            }
+
             // Pokaż prezentację
             this.showPresentation();
+
+            // Pokaż przycisk udostępniania
+            const shareBtn = document.getElementById('share-btn');
+            if (shareBtn) shareBtn.classList.remove('hidden');
 
         } catch (error) {
             console.error('Błąd przetwarzania pliku:', error);

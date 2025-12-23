@@ -955,7 +955,8 @@ class Presentation {
      * Formatuj liczbę z separatorami tysięcy
      */
     formatNumber(num) {
-        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+        if (num === undefined || num === null) return '0';
+        return num.toString().replace(/\B(?=(?:\d{3})+(?!\d))/g, ' ');
     }
 
     /**

@@ -18,6 +18,8 @@ const translations = {
         uploadButton: 'Wybierz plik',
         processing: 'Przetwarzanie...',
         restart: 'Od nowa',
+        shareLink: 'Kopiuj link',
+        linkCopied: 'Skopiowano!',
 
         // Slajdy - intro
         introTitle: 'Twój rok {year}',
@@ -170,6 +172,8 @@ const translations = {
         uploadButton: 'Choose file',
         processing: 'Processing...',
         restart: 'Start over',
+        shareLink: 'Copy share link',
+        linkCopied: 'Copied!',
 
         // Slides - intro
         introTitle: 'Your year {year}',

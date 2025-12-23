@@ -63,7 +63,7 @@ class ADIFParser {
      */
     filterTo2025() {
         const totalBefore = this.qsos.length;
-        
+
         this.qsos = this.qsos.filter(qso => {
             // Use dateRaw (original string YYYYMMDD) or date object
             if (qso.dateRaw) {
@@ -87,17 +87,17 @@ class ADIFParser {
      */
     checkNon2025QSOs() {
         const qsosByYear = {};
-        
+
         this.qsos.forEach(qso => {
             let year = null;
-            
+
             // Get year from dateRaw (original YYYYMMDD string) or date object
             if (qso.dateRaw) {
                 year = qso.dateRaw.substring(0, 4);
             } else if (qso.date && qso.date.year) {
                 year = String(qso.date.year);
             }
-            
+
             if (year) {
                 if (!qsosByYear[year]) {
                     qsosByYear[year] = [];
@@ -109,7 +109,7 @@ class ADIFParser {
         const years = Object.keys(qsosByYear).sort();
         console.log('=== YEAR ANALYSIS IN LOG ===');
         console.log(`Years found: ${years.join(', ')}`);
-        
+
         years.forEach(year => {
             const count = qsosByYear[year].length;
             const percentage = ((count / this.qsos.length) * 100).toFixed(1);

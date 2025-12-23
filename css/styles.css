@@ -551,6 +551,42 @@ body::before {
     box-shadow: 0 0 20px var(--neon-yellow);
 }
 
+/* Share button */
+.share-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background: rgba(10, 10, 26, 0.9);
+    border: 2px solid var(--neon-cyan);
+    color: var(--neon-cyan);
+    padding: 10px 20px;
+    border-radius: 0;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: inherit;
+    text-shadow: 0 0 10px var(--neon-cyan);
+    z-index: 9999;
+}
+
+.share-btn:hover {
+    background: var(--neon-cyan);
+    color: var(--text-dark);
+    text-shadow: none;
+    box-shadow: 0 0 20px var(--neon-cyan);
+}
+
+.share-btn.copied {
+    background: var(--neon-green);
+    border-color: var(--neon-green);
+    color: var(--text-dark);
+    text-shadow: none;
+}
+
+.share-btn.hidden {
+    display: none;
+}
+
 /* Animations */
 @keyframes fadeInDown {
     from {
@@ -709,6 +745,14 @@ body::before {
     .restart-btn {
         top: 5px;
         right: 5px;
+        padding: 4px 8px;
+        font-size: 0.6rem;
+        z-index: 100;
+    }
+
+    .share-btn {
+        top: 5px;
+        left: 5px;
         padding: 4px 8px;
         font-size: 0.6rem;
         z-index: 100;
