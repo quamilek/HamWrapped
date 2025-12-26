@@ -36,7 +36,8 @@ class StatisticsCalculator {
             specialModes: this.calculateSpecialModes(),
             averageQSOsPerDay: this.calculateAverageQSOsPerDay(),
             activeDays: this.calculateActiveDays(),
-            streaks: this.calculateStreaks()
+            streaks: this.calculateStreaks(),
+            bandSlots: this.calculateBandSlots()
         };
 
         return this.stats;
@@ -877,6 +878,77 @@ class StatisticsCalculator {
         }
 
         return { lat, lon };
+    }
+
+    /**
+     * Oblicz band slots (unikalne kombinacje DXCC + pasmo)
+     */
+    calculateBandSlots() {
+        const slots = new Set();
+        const slotsByDxcc = {};
+        const slotsByBand = {};
+
+        this.qsos.forEach(qso => {
+            // Pobierz DXCC - z qso.dxcc lub z nazwy kraju
+            let dxccKey = qso.dxcc;
+            let dxccName = qso.country;
+
+            if (dxccKey && DXCC_DATA[dxccKey]) {
+                dxccName = DXCC_DATA[dxccKey].name;
+            } else if (dxccName && window.findDxccByName) {
+                const dxccInfo = window.findDxccByName(dxccName);
+                if (dxccInfo) {
+                    dxccKey = dxccInfo.dxcc || dxccName;
+                }
+            }
+
+            const band = qso.band;
+
+            // Potrzebujemy zarówno DXCC jak i pasma
+            if ((dxccKey || dxccName) && band) {
+                const entityKey = dxccKey || dxccName;
+                const slotKey = `${entityKey}::${band}`;
+                
+                if (!slots.has(slotKey)) {
+                    slots.add(slotKey);
+
+                    // Zlicz sloty per DXCC
+                    if (!slotsByDxcc[entityKey]) {
+                        slotsByDxcc[entityKey] = {
+                            name: dxccName || `DXCC ${entityKey}`,
+                            bands: new Set(),
+                            count: 0
+                        };
+                    }
+                    slotsByDxcc[entityKey].bands.add(band);
+                    slotsByDxcc[entityKey].count++;
+
+                    // Zlicz sloty per Band
+                    if (!slotsByBand[band]) {
+                        slotsByBand[band] = new Set();
+                    }
+                    slotsByBand[band].add(entityKey);
+                }
+            }
+        });
+
+        // Sortuj DXCC według liczby slotów
+        const topDxcc = Object.entries(slotsByDxcc)
+            .map(([key, data]) => ({
+                dxcc: key,
+                name: data.name,
+                slots: data.count,
+                bands: Array.from(data.bands)
+            }))
+            .sort((a, b) => b.slots - a.slots);
+
+        return {
+            totalSlots: slots.size,
+            dxccCount: Object.keys(slotsByDxcc).length,
+            bandCount: Object.keys(slotsByBand).length,
+            topDxcc: topDxcc.slice(0, 5),
+            allDxcc: topDxcc
+        };
     }
 
     /**

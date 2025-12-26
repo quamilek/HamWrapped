@@ -82,6 +82,12 @@ const translations = {
         dxccNoDataHint: 'Sprawdź czy plik ADIF zawiera poprawne callsigns',
         dxccSubtitle: 'Pracowałeś z {count} krajami DXCC!',
 
+        // Slajdy - Band Slots
+        bandSlotsTitle: 'Band Slots',
+        bandSlotsDescription: 'Unikalne kombinacje DXCC + pasmo',
+        bandSlotsSubtitle: '{dxcc} DXCC na {bands} pasmach',
+        bandSlotsTopTitle: 'Top kraje wg slotów',
+
         // Slajdy - ODX
         odxTitle: 'Twój ODX',
         odxStation: 'Stacja: {call}',
@@ -235,6 +241,12 @@ const translations = {
         dxccNoData: 'No DXCC country data',
         dxccNoDataHint: 'Check if ADIF file contains valid callsigns',
         dxccSubtitle: 'You worked {count} DXCC entities!',
+
+        // Slides - Band Slots
+        bandSlotsTitle: 'Band Slots',
+        bandSlotsDescription: 'Unique DXCC + band combinations',
+        bandSlotsSubtitle: '{dxcc} DXCC across {bands} bands',
+        bandSlotsTopTitle: 'Top countries by slots',
 
         // Slides - ODX
         odxTitle: 'Your ODX',

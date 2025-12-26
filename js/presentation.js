@@ -55,6 +55,11 @@ class Presentation {
         // Slajd 10: Top DXCC
         this.addTopDXCCSlide();
 
+        // Slajd 10b: Band Slots
+        if (this.stats.bandSlots && this.stats.bandSlots.totalSlots > 0) {
+            this.addBandSlotsSlide();
+        }
+
         // Slajd 11: ODX
         if (this.stats.odx) {
             this.addODXSlide();
@@ -344,6 +349,25 @@ class Presentation {
     }
 
     /**
+     * Slajd Band Slots
+     */
+    addBandSlotsSlide() {
+        const bandSlots = this.stats.bandSlots;
+
+        this.slides.push({
+            theme: 'theme-3',
+            icon: '🎰',
+            title: t('bandSlotsTitle'),
+            value: this.formatNumber(bandSlots.totalSlots),
+            description: t('bandSlotsDescription'),
+            subtitle: t('bandSlotsSubtitle', { 
+                dxcc: bandSlots.dxccCount, 
+                bands: bandSlots.bandCount 
+            })
+        });
+    }
+
+    /**
      * Slajd ODX
      */
     addODXSlide() {
@@ -620,6 +644,16 @@ class Presentation {
             label: 'DXCC',
             subtitle: i18n.currentLang === 'pl' ? 'krajów' : 'countries'
         });
+
+        // 8b. Band Slots
+        if (this.stats.bandSlots && this.stats.bandSlots.totalSlots > 0) {
+            items.push({
+                icon: '🎰',
+                value: this.formatNumber(this.stats.bandSlots.totalSlots),
+                label: t('bandSlotsTitle'),
+                subtitle: ''
+            });
+        }
 
         // 9. CQ Zones
         const cqZones = this.stats.byCQZone ? this.stats.byCQZone.count : 0;
