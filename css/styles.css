@@ -302,6 +302,7 @@ body::before {
     height: calc(100vh - 120px);
     max-height: 850px;
     position: relative;
+    margin-bottom: 20px;
 }
 
 .slide {
@@ -830,7 +831,7 @@ body::before {
 /* Desktop - szerszy slajd podsumowania */
 @media (min-width: 501px) {
     .slide-scrollable {
-        width: 170%;
+        width: 180%;
         left: -35%;
     }
 }
